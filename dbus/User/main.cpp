@@ -13,14 +13,58 @@
 
 
 #include "ebox.h"
+#include "dbus.h"
 
 u32 count;
+
+#define  Head '$'
+#define  End '!'
+
+#define  NeedHead 0
+#define  NeedData 1
+#define  DataEnd 2
+
+u8 State = NeedHead;
+char uart2_Recive[100];//接收数组
 void test()
 {
-    uint8_t c;
-	c = uart2.receive();
-    uart2.put_char(c);
-	PB9.toggle();
+	u8 c,i;
+    c = uart2.receive();
+    switch(State)
+    {
+		case NeedHead:
+			if(c == Head)
+			{
+				dbus_recivelength = 0;
+				uart2_Recive[dbus_recivelength++] = c;
+				State = NeedData;
+			}
+			break;
+		case NeedData:
+			if(c == End)
+			{
+				uart2_Recive[dbus_recivelength++] = c;
+				State = DataEnd;
+				
+				//接收完成,去掉协议头，重装数据
+				dbus_recivelength-=2;
+				for(i=0;i<dbus_recivelength;i++)
+				{
+					Dbus_Recive[i]=uart2_Recive[i+1];
+				}
+				//解析数据
+				AnalyzeDbus();
+				//清空数组
+				memset(uart2_Recive,0,100);
+				memset(Dbus_Recive,0,100);
+				State = NeedHead;
+			}
+			else
+			{
+				uart2_Recive[dbus_recivelength++] = c;
+			}
+			break;
+    }
 }
 void test1()
 {
@@ -50,26 +94,9 @@ int main(void)
     setup();
     while(1)
     {
-		uart2.printf("uart is ok ! count = %d\r\n", count);
-//        PB8.reset();
-		delay_ms(OnTime);
-//        PB8.set();
-//		delay_ms(OffTime);
-//		
-//        PB9.reset();
-//		delay_ms(OnTime);
-//		PB9.set();
-//		delay_ms(OffTime);
-//		
-//        PE0.reset();
-//		delay_ms(OnTime);
-//		PE0.set();
-//		delay_ms(OffTime);
-//		
-//        PE1.reset();
-//		delay_ms(OnTime);
-//		PE1.set();
-//		delay_ms(OffTime);
+		//uart2.printf("uart is ok ! count = %d\r\n", count);
+		Heart();
+		delay_ms(2000);
     }
 
 }
