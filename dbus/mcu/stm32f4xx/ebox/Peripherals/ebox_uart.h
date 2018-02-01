@@ -5,7 +5,6 @@
 //”√ªß≈‰÷√//////////////
 #define UART_MAX_SEND_BUF 128
 
-
 class Usart
 {
 public:

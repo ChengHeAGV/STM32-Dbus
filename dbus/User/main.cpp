@@ -68,17 +68,21 @@ void test()
 }
 void test1()
 {
-    count++;
-    PB8.toggle();
+//    count++;
+//    PB8.toggle();
 }
 void setup()
 {
     ebox_init();
 	//LED 初始化
     PB8.mode(OUTPUT_PP);
-//	PB9.mode(OUTPUT_PP);
-//	PE0.mode(OUTPUT_PP);
-//	PE1.mode(OUTPUT_PP);
+	PB9.mode(OUTPUT_PP);
+	PE0.mode(OUTPUT_PP);
+	PE1.mode(OUTPUT_PP);
+	PB8.reset();
+	PE0.reset();
+	PB9.set();
+	PE1.set();
 	
 	//串口初始化
 	uart2.begin(115200);
@@ -89,16 +93,34 @@ void setup()
 u16 OnTime=300;
 u16 OffTime=10;
 
+void led()
+{
+	PB8.toggle();
+	PB9.toggle();
+	PE0.toggle();
+	PE1.toggle();
+}
+
 int main(void)
 {
+	u16 i=0;
     setup();
     while(1)
     {
 		//uart2.printf("uart is ok ! count = %d\r\n", count);
 		Heart();
-		delay_ms(2000);
+		led();
+		delay_ms(100);
+		Heart();
+		led();
+		delay_ms(100);
+		for(i=0;i<10;i++)
+		{
+			Write_Word(4,i,random());
+			led();
+			//delay_ms(10);
+		}
     }
-
 }
 
 
