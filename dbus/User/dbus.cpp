@@ -1,6 +1,7 @@
 #include "dbus.h"
 #include "string.h"
 #include "stdarg.h"
+
 u16 Dbus_Data[100];//寄存器
 char Dbus_Recive[100];//接收数组
 
@@ -14,16 +15,20 @@ u16 response=0;//响应标志
 char Dbus_TX_BUF[100];
 
 Usart uart = uart2;
-//延时函数，最大65535ms
-void dbus_delay_ms(u16 time)
+
+//发送数据到服务器
+void SendToSever(char* buf,u8 len)
 {
-//	OS_ERR err;OSTimeDly(10,OS_OPT_TIME_HMSM_STRICT,&err);
-//	u16 i=0;
-//	for(i=0;i<time;i++)
-//	{
-//		//OSTimeDlyHMSM(0,0,0,1,OS_OPT_TIME_HMSM_STRICT,&err);
-//			OSTimeDly(10,OS_OPT_TIME_HMSM_STRICT,&err);
-//	}
+	u8 i;
+	//发送消息头 
+	uart.printf("$");
+	//有效数据部分转成16进制ASCII码
+	for(int i=0;i<len;i++)
+	{
+		uart.printf("%02X",buf[i]);
+	}
+	//发送消息尾
+	uart.printf("!");
 }
 
 void Heart()//心跳函数
@@ -41,7 +46,7 @@ void Heart()//心跳函数
 	Dbus_TX_BUF[5] = crctemp>>8;//CRC高
 	Dbus_TX_BUF[6] = crctemp;//CRC低
 	
-	uart.printf_length(Dbus_TX_BUF,7);
+	SendToSever(Dbus_TX_BUF,7);
 }
 
 /// <summary>
@@ -54,26 +59,28 @@ u8 Write_Word(u16 DstAdress,u16 RegisterAdress,u16 data)//写单个寄存器
 {
 	u16 crctemp=0;
 	u16 j,timeout,num=0;
+	
+	char BUF[12];
+	
 	for(j=0;j<repeatNum; j++)
 	{
-		Dbus_TX_BUF[0] = DbusLocalAddress>>8;//本机地址高
-		Dbus_TX_BUF[1] = DbusLocalAddress;//本机地址低
-		Dbus_TX_BUF[2] = 1;//帧类型
-		Dbus_TX_BUF[3] = DstAdress>>8;//目标地址高
-		Dbus_TX_BUF[4] = DstAdress;//目标地址低
-		Dbus_TX_BUF[5] = 2;//功能码
-		Dbus_TX_BUF[6] = RegisterAdress>>8;//寄存器地址高
-		Dbus_TX_BUF[7] = RegisterAdress;//寄存器地址低
-		Dbus_TX_BUF[8] = data>>8;//数据高
-		Dbus_TX_BUF[9] = data;//数据低
+		BUF[0] = DbusLocalAddress>>8;//本机地址高
+		BUF[1] = DbusLocalAddress;//本机地址低
+		BUF[2] = 1;//帧类型
+		BUF[3] = DstAdress>>8;//目标地址高
+		BUF[4] = DstAdress;//目标地址低
+		BUF[5] = 2;//功能码
+		BUF[6] = RegisterAdress>>8;//寄存器地址高
+		BUF[7] = RegisterAdress;//寄存器地址低
+		BUF[8] = data>>8;//数据高
+		BUF[9] = data;//数据低
 	 
-		crctemp=dbus_CalcCrc(Dbus_TX_BUF,10);
+		crctemp=dbus_CalcCrc(BUF,10);
 		
-		Dbus_TX_BUF[10] = crctemp>>8;//CRC高
-		Dbus_TX_BUF[11] = crctemp;//CRC低
+		BUF[10] = crctemp>>8;//CRC高
+		BUF[11] = crctemp;//CRC低
 		
-		uart.printf_length(Dbus_TX_BUF,12);
-		
+		SendToSever(BUF,12);
 		//等待响应
 		timeout=0;
 		while(response==0&&(timeout<responseTime/10))
@@ -402,4 +409,13 @@ u16 WriteStr(u16 DstAdress,u16 RegisterAdress,char* str)
 	}
 	return Write_MultipleWord(DstAdress,RegisterAdress,len2,data);
 }
+
+
+
+
+
+
+
+
+
 

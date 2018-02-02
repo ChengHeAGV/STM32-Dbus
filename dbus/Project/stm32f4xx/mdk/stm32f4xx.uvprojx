@@ -365,7 +365,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\mcu\stm32f4xx\Libraries\CMSIS\Device\ST\STM32F4xx\Include;..\..\..\mcu\stm32f4xx\Libraries\STM32F4xx_StdPeriph_Driver\inc;..\..\..\User;..\..\..\mcu\stm32f4xx\ebox;..\..\..\mcu\stm32f4xx\ebox\core;..\..\..\mcu\stm32f4xx\ebox\Peripherals;..\..\..\common\edriver</IncludePath>
+              <IncludePath>..\..\..\mcu\stm32f4xx\Libraries\CMSIS\Device\ST\STM32F4xx\Include;..\..\..\mcu\stm32f4xx\Libraries\STM32F4xx_StdPeriph_Driver\inc;..\..\..\User;..\..\..\mcu\stm32f4xx\ebox;..\..\..\mcu\stm32f4xx\ebox\core;..\..\..\mcu\stm32f4xx\ebox\Peripherals;..\..\..\common\edriver;..\..\..\User</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>

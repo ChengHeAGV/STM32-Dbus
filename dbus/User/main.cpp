@@ -15,56 +15,35 @@
 #include "ebox.h"
 #include "dbus.h"
 
-u32 count;
-
-#define  Head '$'
-#define  End '!'
-
-#define  NeedHead 0
-#define  NeedData 1
-#define  DataEnd 2
-
-u8 State = NeedHead;
+u32 count = 0;
 char uart2_Recive[100];//接收数组
+
+//串口接收
 void test()
 {
-	u8 c,i;
-    c = uart2.receive();
-    switch(State)
-    {
-		case NeedHead:
-			if(c == Head)
+	u8 i = 0;
+	char temp[100];//临时数组
+	char *p;
+	//串口收到数据加入缓冲池中
+    uart2_Recive[count++] = uart2.receive();
+	
+	//搜索是否有有效数据
+	if (1==sscanf(uart2_Recive,"%*[^$]$%[^!]",temp)) 
+	{
+		//将得到的数据转换为数值数组
+		//执行解析函数
+		//清除第一个结束符之前的数据（已经使用过及之前的无效数据）
+		p=strchr(uart2_Recive, '!');
+		if (p)
+		{
+			for(i=0;i<count;i++)
 			{
-				dbus_recivelength = 0;
-				uart2_Recive[dbus_recivelength++] = c;
-				State = NeedData;
+				uart2_Recive[i]=uart2_Recive[i+p-uart2_Recive];
 			}
-			break;
-		case NeedData:
-			if(c == End)
-			{
-				uart2_Recive[dbus_recivelength++] = c;
-				State = DataEnd;
-				
-				//接收完成,去掉协议头，重装数据
-				dbus_recivelength-=2;
-				for(i=0;i<dbus_recivelength;i++)
-				{
-					Dbus_Recive[i]=uart2_Recive[i+1];
-				}
-				//解析数据
-				AnalyzeDbus();
-				//清空数组
-				memset(uart2_Recive,0,100);
-				memset(Dbus_Recive,0,100);
-				State = NeedHead;
-			}
-			else
-			{
-				uart2_Recive[dbus_recivelength++] = c;
-			}
-			break;
-    }
+		}
+
+	}
+	
 }
 void test1()
 {
@@ -101,22 +80,38 @@ void led()
 	PE1.toggle();
 }
 
+
+//char s[]="ttt=eee&name=aaaaaaaaaaa&pass=bbbbbgbb&usession=undefined";
+char s[]="03$0382!$014c!$045d!$0";
+
+char t[40];
+
+
+int mum=0;
 int main(void)
 {
 	u16 i=0;
+	char* temp;
+	
+	char str[]="hewllo world";
+    char *p=strchr(str, 'w');
+    if ( p )
+        mum = p-str;
+	
+	
     setup();
     while(1)
     {
 		//uart2.printf("uart is ok ! count = %d\r\n", count);
 		Heart();
 		led();
-		delay_ms(100);
-		Heart();
+		delay_ms(10);
+//		Heart();
 		led();
-		delay_ms(100);
-		for(i=0;i<10;i++)
+		//delay_ms(100);
+		for(i=0;i<100;i++)
 		{
-			Write_Word(4,i,random());
+			Write_Word(4,i,random(0xff));
 			led();
 			//delay_ms(10);
 		}
