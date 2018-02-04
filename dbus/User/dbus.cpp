@@ -14,21 +14,60 @@ u16 response=0;//响应标志
 
 char Dbus_TX_BUF[100];
 
-Usart uart = uart2;
+//Usart uart = uart2;
+void delay_ms(u16 mm)
+{
+	;;
+}
+
+//支持发送中断
+typedef void (*callback_fun_type)(void);
+callback_fun_type dbus_callback_table;
+Dbus::Dbus() 
+{
+};
+
+void Dbus::InPut(char* str) 
+{
+	//触发中断
+	dbus_callback_table();
+};
+
+/**
+ *@name     void USART::attach_rx_interrupt(void (*callback_fun)(void))
+ *@brief    绑定串口接收中断所调用的用户程序
+ *@param    callback_fun:  用户函数
+ *@retval   None
+*/
+void Dbus::OutPut_interrupt(void (*callback_fun)(void))
+{
+        dbus_callback_table = callback_fun;
+}
+
+u8 Dbus::Write_Word(u16 DstAdress,u16 RegisterAdress,u16 data)//写单个寄存器
+{
+	this->DstAdress = DstAdress;
+	this->RegisterAdress = RegisterAdress;
+	this->data = data;
+
+	return 10;
+}
+
+
 
 //发送数据到服务器
 void SendToSever(char* buf,u8 len)
 {
-	u8 i;
-	//发送消息头 
-	uart.printf("$");
-	//有效数据部分转成16进制ASCII码
-	for(int i=0;i<len;i++)
-	{
-		uart.printf("%02X",buf[i]);
-	}
-	//发送消息尾
-	uart.printf("!");
+//	u8 i;
+//	//发送消息头 
+//	uart.printf("$");
+//	//有效数据部分转成16进制ASCII码
+//	for(int i=0;i<len;i++)
+//	{
+//		uart.printf("%02X",buf[i]);
+//	}
+//	//发送消息尾
+//	uart.printf("!");
 }
 
 void Heart()//心跳函数
@@ -119,59 +158,59 @@ u8 Write_Word(u16 DstAdress,u16 RegisterAdress,u16 data)//写单个寄存器
 /// <param name="Data">待写入数据指针</param>
 u8 Write_MultipleWord(u16 DstAdress,u16 RegisterAdress,u8 Num,u16* Data)//写单个寄存器
 {
-	u16 crctemp=0;
-	u16 i = 0,j,timeout,num=0;
-	for(j=0;j<repeatNum; j++)
-	{
-		Dbus_TX_BUF[0] = DbusLocalAddress>>8;//本机地址高
-		Dbus_TX_BUF[1] = DbusLocalAddress;//本机地址低
-		Dbus_TX_BUF[2] = 1;//帧类型
-		Dbus_TX_BUF[3] = DstAdress>>8;//目标地址高
-		Dbus_TX_BUF[4] = DstAdress;//目标地址低
-		Dbus_TX_BUF[5] = 4;//功能码
-		Dbus_TX_BUF[6] = RegisterAdress>>8;//寄存器地址高
-		Dbus_TX_BUF[7] = RegisterAdress;//寄存器地址低
-		Dbus_TX_BUF[8] = Num;//寄存器数量
+//	u16 crctemp=0;
+//	u16 i = 0,j,timeout,num=0;
+//	for(j=0;j<repeatNum; j++)
+//	{
+//		Dbus_TX_BUF[0] = DbusLocalAddress>>8;//本机地址高
+//		Dbus_TX_BUF[1] = DbusLocalAddress;//本机地址低
+//		Dbus_TX_BUF[2] = 1;//帧类型
+//		Dbus_TX_BUF[3] = DstAdress>>8;//目标地址高
+//		Dbus_TX_BUF[4] = DstAdress;//目标地址低
+//		Dbus_TX_BUF[5] = 4;//功能码
+//		Dbus_TX_BUF[6] = RegisterAdress>>8;//寄存器地址高
+//		Dbus_TX_BUF[7] = RegisterAdress;//寄存器地址低
+//		Dbus_TX_BUF[8] = Num;//寄存器数量
 
-		//循环写入数据到发送缓冲区
-		for(i=0;i<Num;i++)
-		{
-			Dbus_TX_BUF[9+2*i] = Data[i]>>8;//数据高
-			Dbus_TX_BUF[10+2*i] = Data[i];//数据低
-		}
-	 
-		crctemp=dbus_CalcCrc(Dbus_TX_BUF,9+2*Num);
-		
-		Dbus_TX_BUF[8+2*Num+1] = crctemp>>8;//CRC高
-		Dbus_TX_BUF[8+2*Num+2] = crctemp;//CRC低
+//		//循环写入数据到发送缓冲区
+//		for(i=0;i<Num;i++)
+//		{
+//			Dbus_TX_BUF[9+2*i] = Data[i]>>8;//数据高
+//			Dbus_TX_BUF[10+2*i] = Data[i];//数据低
+//		}
+//	 
+//		crctemp=dbus_CalcCrc(Dbus_TX_BUF,9+2*Num);
+//		
+//		Dbus_TX_BUF[8+2*Num+1] = crctemp>>8;//CRC高
+//		Dbus_TX_BUF[8+2*Num+2] = crctemp;//CRC低
 
-		uart.printf_length(Dbus_TX_BUF,9+2*Num+2);
+//		uart.printf_length(Dbus_TX_BUF,9+2*Num+2);
 
-		//等待响应
-		timeout=0;
-		while(response==0&&(timeout<responseTime/10))//
-		{
-			timeout++;
-			delay_ms(10);
-		}
-		if(timeout<(responseTime/10))//正常响应，结束
-		{
-			j = repeatNum;
-			response = 0;		
-			return 1;
-		}
-		
-		//已重发次数加一
-		num++;
-		
-		if(timeout<(responseTime/10))//超时
-		{
-			if(num==repeatNum)//重发次数到达上限，发送失败，返回0
-			{
-				return 0;
-			}
-		}
-	}
+//		//等待响应
+//		timeout=0;
+//		while(response==0&&(timeout<responseTime/10))//
+//		{
+//			timeout++;
+//			delay_ms(10);
+//		}
+//		if(timeout<(responseTime/10))//正常响应，结束
+//		{
+//			j = repeatNum;
+//			response = 0;		
+//			return 1;
+//		}
+//		
+//		//已重发次数加一
+//		num++;
+//		
+//		if(timeout<(responseTime/10))//超时
+//		{
+//			if(num==repeatNum)//重发次数到达上限，发送失败，返回0
+//			{
+//				return 0;
+//			}
+//		}
+//	}
 	return 1;
 }
 
@@ -275,25 +314,25 @@ void RecFuc4()
 /// <param name="Data">结果</param>
 void responsedata(u16 DstAdress,u8 func,u8 resault)
 {
-	u16 crctemp=0;
-	Dbus_TX_BUF[0] = DbusLocalAddress>>8;//本机地址高
-	Dbus_TX_BUF[1] = DbusLocalAddress;//本机地址低
-	Dbus_TX_BUF[2] = 2;//帧类型
-	Dbus_TX_BUF[3] = DstAdress>>8;//目标地址高
-	Dbus_TX_BUF[4] = DstAdress;//目标地址低
-	Dbus_TX_BUF[5] = func;//功能码
-	Dbus_TX_BUF[6] = resault;//结果
-	 
-	crctemp=dbus_CalcCrc(Dbus_TX_BUF,7);
-	
-	Dbus_TX_BUF[7] = crctemp>>8;//CRC高
-	Dbus_TX_BUF[8] = crctemp;//CRC低
-	
-	uart.printf_length(Dbus_TX_BUF,9);
+//	u16 crctemp=0;
+//	Dbus_TX_BUF[0] = DbusLocalAddress>>8;//本机地址高
+//	Dbus_TX_BUF[1] = DbusLocalAddress;//本机地址低
+//	Dbus_TX_BUF[2] = 2;//帧类型
+//	Dbus_TX_BUF[3] = DstAdress>>8;//目标地址高
+//	Dbus_TX_BUF[4] = DstAdress;//目标地址低
+//	Dbus_TX_BUF[5] = func;//功能码
+//	Dbus_TX_BUF[6] = resault;//结果
+//	 
+//	crctemp=dbus_CalcCrc(Dbus_TX_BUF,7);
+//	
+//	Dbus_TX_BUF[7] = crctemp>>8;//CRC高
+//	Dbus_TX_BUF[8] = crctemp;//CRC低
+//	
+//	uart.printf_length(Dbus_TX_BUF,9);
 }
 
 /*错误返回*/
-void errorsend2(uint8_t func,uint8_t type)
+void errorsend2(u8 func,u8 type)
 {
 
 }
@@ -308,10 +347,10 @@ crc16校验码计算函数,计算算法：
 5、重复步骤2、3、4直到完成所有字节
 6、返回计算结果
 ***********************************************/
-uint16_t dbus_CalcCrc(char *chData,unsigned short uNo)
+u16 dbus_CalcCrc(char *chData,unsigned short uNo)
 {
-	uint16_t crc=0xffff;
-	uint16_t i,j;
+	u16 crc=0xffff;
+	u16 i,j;
 	for(i=0;i<uNo;i++)
 	{
 	  crc^=chData[i];
@@ -341,29 +380,29 @@ void clear_rxBuf2()
 //timeout:超时时间
 int check(char* dst,u16 timeout,char* src,...)
 {
-	u16 num=0;
-	char *resault;
-	
-	u16 i;
-	va_list ap;
-	va_start(ap,src);
-	vsprintf((char*)Dbus_TX_BUF,src,ap);
-	va_end(ap);
-	i=strlen((const char*)Dbus_TX_BUF);//此次发送数据的长度
+//	u16 num=0;
+//	char *resault;
+//	
+//	u16 i;
+//	va_list ap;
+//	va_start(ap,src);
+//	vsprintf((char*)Dbus_TX_BUF,src,ap);
+//	va_end(ap);
+//	i=strlen((const char*)Dbus_TX_BUF);//此次发送数据的长度
 
-    uart.printf_length(Dbus_TX_BUF,i);
-	while(!resault&&num<(timeout/10.0))
-	{
-		resault=strstr(Dbus_Recive,dst);
-		delay_ms(10);
-		num++;
-	}
-	clear_rxBuf2();
-	if(resault)
-	{
-		return 1;
-	}
-	else
+//    uart.printf_length(Dbus_TX_BUF,i);
+//	while(!resault&&num<(timeout/10.0))
+//	{
+//		resault=strstr(Dbus_Recive,dst);
+//		delay_ms(10);
+//		num++;
+//	}
+//	clear_rxBuf2();
+//	if(resault)
+//	{
+//		return 1;
+//	}
+//	else
 		return 0;
 }
 

@@ -14,12 +14,14 @@
 
 #include "ebox.h"
 #include "dbus.h"
+#include "led.h"
+
 
 long int count = 0;
-char uart2_Recive[]="03$0356342382!$014caabbcc!$043467895d!$0";//接收数组
-
-// $00040100040200050065652B!
-
+//数据接收缓冲池--字符串数组
+char uart2_Recive[]="03$0356342382!$014caabbcc!$043467895d!$0";
+//消息响应池--二维数组
+char ResponseBuf[1][1];
 //将16进制字符串转数值
 void HexStrToDec(char* str,char* dec)
 {
@@ -38,7 +40,7 @@ void HexStrToDec(char* str,char* dec)
 
 
 char buf[100];
-	char temp[100];//临时数组
+char temp[100];//临时数组
 //数据解包
 void OpenBox()
 {
@@ -172,14 +174,21 @@ void led()
 //char s[]="ttt=eee&name=aaaaaaaaaaa&pass=bbbbbgbb&usession=undefined";
 //char s[] = "03$0382!$014c!$045d!$0";
 char s[] = "123410042B66";
+void dbus_test()
+{
+	char ss[] = "123410042B66";
 
-
-
-
+}
 
 int main(void)
 {
 	u16 i = 0;
+	Dbus dbus;
+	dbus.Write_Word(1,1,1);
+	dbus.OutPut_interrupt(dbus_test);
+	
+	dbus.InPut("a");
+	
 	OpenBox();
 	
 	setup();

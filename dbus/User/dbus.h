@@ -1,6 +1,48 @@
+/*
+	******************************************************************************
+  * @file    dbus.cpp
+  * @author  孙毅明
+  * @version V1.2
+  * @date    2018/02/01
+  * @brief   分布式通信系统
+  ******************************************************************************
+  * @attention
+  * 分布式通信系统，无主设计，设备间任意访问，移植只需要提供一个发送数据方法，并
+  * 且把收到的数写入系统提供的接口函数即可，无需设置任何硬件
+  * 
+  * 
+	*
+  * 
+  ******************************************************************************
+*/
+
 #ifndef __DBUS_H
 #define	__DBUS_H
-#include "ebox.h"
+
+/*--- Includes ---------------------------------------------------------------*/
+//#include "ebox.h"
+
+/*--- 用户配置 ---------------------------------------------------------------*/
+#define UART_MAX_SEND_BUF 128
+
+#define u8 char
+#define u16 unsigned short
+
+class Dbus
+{
+	public:
+			Dbus();
+			//输入数据
+			void InPut(char* str);
+			//输出数据中断
+	    void OutPut_interrupt(void (*callback_fun)(void));
+			u8 Write_Word(u16 DstAdress,u16 RegisterAdress,u16 data);
+			
+	private:
+			u16 DstAdress;
+			u16 RegisterAdress;
+			u16 data;
+};
 
 extern char Dbus_Recive[100];//接收数组
 extern u16 dbus_recivelength;//接收长度

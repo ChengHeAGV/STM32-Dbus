@@ -2,8 +2,6 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include "string.h"
-
-
 callback_fun_type usart_callback_table[5][2];//支持串口的rx中断
 #define uart_tx_length   100
 uint8_t uart_tx_buf[uart_tx_length];
