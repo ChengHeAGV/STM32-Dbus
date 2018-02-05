@@ -1,11 +1,12 @@
 .\output\fsmc_sram.o: ..\..\..\Driver\fsmc_sram.c
 .\output\fsmc_sram.o: ..\..\..\Driver\fsmc_sram.h
 .\output\fsmc_sram.o: ..\..\..\mcu\stm32f4xx\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h
-.\output\fsmc_sram.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include\core_cm4.h
+.\output\fsmc_sram.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.2.0\CMSIS\Include\core_cm4.h
 .\output\fsmc_sram.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
-.\output\fsmc_sram.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include\core_cmInstr.h
-.\output\fsmc_sram.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include\core_cmFunc.h
-.\output\fsmc_sram.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include\core_cmSimd.h
+.\output\fsmc_sram.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.2.0\CMSIS\Include\cmsis_version.h
+.\output\fsmc_sram.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.2.0\CMSIS\Include\cmsis_compiler.h
+.\output\fsmc_sram.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.2.0\CMSIS\Include\cmsis_armcc.h
+.\output\fsmc_sram.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.2.0\CMSIS\Include\mpu_armv7.h
 .\output\fsmc_sram.o: ..\..\..\mcu\stm32f4xx\Libraries\CMSIS\Device\ST\STM32F4xx\Include\system_stm32f4xx.h
 .\output\fsmc_sram.o: ..\..\..\mcu\stm32f4xx\ebox\stm32f4xx_conf.h
 .\output\fsmc_sram.o: ..\..\..\mcu\stm32f4xx\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_adc.h

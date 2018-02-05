@@ -4,11 +4,12 @@
 .\output\parallel_gpio.o: ..\..\..\mcu\stm32f4xx\ebox\core\ebox_common.h
 .\output\parallel_gpio.o: ..\..\..\mcu\stm32f4xx\ebox\core\mcu_core.h
 .\output\parallel_gpio.o: ..\..\..\mcu\stm32f4xx\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h
-.\output\parallel_gpio.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include\core_cm4.h
+.\output\parallel_gpio.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.2.0\CMSIS\Include\core_cm4.h
 .\output\parallel_gpio.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
-.\output\parallel_gpio.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include\core_cmInstr.h
-.\output\parallel_gpio.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include\core_cmFunc.h
-.\output\parallel_gpio.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include\core_cmSimd.h
+.\output\parallel_gpio.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.2.0\CMSIS\Include\cmsis_version.h
+.\output\parallel_gpio.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.2.0\CMSIS\Include\cmsis_compiler.h
+.\output\parallel_gpio.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.2.0\CMSIS\Include\cmsis_armcc.h
+.\output\parallel_gpio.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.2.0\CMSIS\Include\mpu_armv7.h
 .\output\parallel_gpio.o: ..\..\..\mcu\stm32f4xx\Libraries\CMSIS\Device\ST\STM32F4xx\Include\system_stm32f4xx.h
 .\output\parallel_gpio.o: ..\..\..\mcu\stm32f4xx\ebox\stm32f4xx_conf.h
 .\output\parallel_gpio.o: ..\..\..\mcu\stm32f4xx\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_adc.h

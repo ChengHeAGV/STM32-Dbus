@@ -2,11 +2,12 @@
 .\output\mcu_mem.o: ..\..\..\mcu\stm32f4xx\ebox\core\mcu_mem.h
 .\output\mcu_mem.o: ..\..\..\mcu\stm32f4xx\ebox\core\mcu_core.h
 .\output\mcu_mem.o: ..\..\..\mcu\stm32f4xx\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h
-.\output\mcu_mem.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include\core_cm4.h
+.\output\mcu_mem.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.2.0\CMSIS\Include\core_cm4.h
 .\output\mcu_mem.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
-.\output\mcu_mem.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include\core_cmInstr.h
-.\output\mcu_mem.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include\core_cmFunc.h
-.\output\mcu_mem.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include\core_cmSimd.h
+.\output\mcu_mem.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.2.0\CMSIS\Include\cmsis_version.h
+.\output\mcu_mem.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.2.0\CMSIS\Include\cmsis_compiler.h
+.\output\mcu_mem.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.2.0\CMSIS\Include\cmsis_armcc.h
+.\output\mcu_mem.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.2.0\CMSIS\Include\mpu_armv7.h
 .\output\mcu_mem.o: ..\..\..\mcu\stm32f4xx\Libraries\CMSIS\Device\ST\STM32F4xx\Include\system_stm32f4xx.h
 .\output\mcu_mem.o: ..\..\..\mcu\stm32f4xx\ebox\stm32f4xx_conf.h
 .\output\mcu_mem.o: ..\..\..\mcu\stm32f4xx\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_adc.h

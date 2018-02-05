@@ -2,6 +2,7 @@
 #include "string.h"
 #include "stdarg.h"
 #include "stdio.h"
+#include "stdlib.h"
 
 //u16 Dbus_Data[100];//寄存器
 //char Dbus_Recive[100];//接收数组
@@ -67,10 +68,9 @@ u16 CRC_CALC(char *chData,unsigned short uNo)
 ***************************************/
 void Send(char* buf,u8 len)
 {
-	u8 i;
 	//数据发送临时数组
-	char TX_BUF[len+2];
-	unsigned int TEMP[len];
+	char *TX_BUF=(char *)malloc((len+2)*sizeof(char));//定义动态数组TX_BUF[len+2];
+	unsigned int *TEMP=(unsigned int *)malloc((len)*sizeof(unsigned int));
 	//消息头 
 	TX_BUF[0]='$';
 
@@ -84,6 +84,13 @@ void Send(char* buf,u8 len)
 	TX_BUF[len+1]='!';
 	//调用发送回调函数
 	dbus_callback_table(TX_BUF);
+	
+	//释放动态开辟的空间
+	free(TX_BUF);
+	free(TEMP);
+	/*为了防止野指针产生*/
+  TX_BUF = NULL;
+	TEMP   = NULL;
 }
 
 
