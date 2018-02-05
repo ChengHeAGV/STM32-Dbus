@@ -4,41 +4,20 @@
 #include "stdio.h"
 #include "stdlib.h"
 
-//u16 Dbus_Data[100];//寄存器
-//char Dbus_Recive[100];//接收数组
-
-//u16 dbus_sendlength;//发送长度
-//u16 dbus_recivelength;//接收长度
-//u16 responseTime=3000;//响应时间3秒
-//u16 repeatNum=3;//重发次数3次
-//u16 DbusLocalAddress = 4;//本机地址
-//u16 response=0;//响应标志
-
-//char Dbus_TX_BUF[100];
-
-//Usart uart = uart2;
-//void delay_ms(u16 mm)
-//{
-//	;;
-//}
-
-
-//支持发送中断
+//定义回调函数指针
 typedef void (*callback_fun_type)(char*);
-callback_fun_type dbus_callback_table;
+callback_fun_type SEND_CALLBACK;
 
-/***************************************
-			内部功能函数
-***************************************/
-/*************************************************
-//crc16校验码计算函数,计算算法：
-//1、设置crc校验寄存器的初值为0xffff;
-//2、将报文的第一个字节与crc寄存器的低字节异或，结果存入crc寄存器
-//3、判断crc的第一位是否为1，如果是1,crc右移1位后和0xa001异或，如果为0，则再移1位；
-//4、重复步骤3，直到完成8个位；
-//5、重复步骤2、3、4直到完成所有字节
-//6、返回计算结果
-***********************************************/
+//帧头
+char DBUS_HEAD = '$'; 
+//帧尾
+char DBUS_END  = '!';
+//正则表达式
+char* DBUS_REGEX = "$%[^!]";
+
+/*********内部功能函数********************************************************************/
+			
+/*********CRC16校验*******************************************************************/
 u16 CRC_CALC(char *chData,unsigned short uNo)
 {
 	u16 crc=0xffff;
@@ -63,16 +42,15 @@ u16 CRC_CALC(char *chData,unsigned short uNo)
 
 
 
-/**************************************
-			发送数据到服务器
-***************************************/
+
+/*********发送函数******************************************************************/
 void Send(char* buf,u8 len)
 {
 	//数据发送临时数组
 	char *TX_BUF=(char *)malloc((len+2)*sizeof(char));//定义动态数组TX_BUF[len+2];
 	unsigned int *TEMP=(unsigned int *)malloc((len)*sizeof(unsigned int));
 	//消息头 
-	TX_BUF[0]='$';
+	TX_BUF[0] = DBUS_HEAD;
 
 	//有效数据部分转成16进制ASCII码
 	sscanf(buf,"%02X",TEMP);
@@ -81,9 +59,9 @@ void Send(char* buf,u8 len)
 		TX_BUF[i+1]=TEMP[i];
 	}
 	//消息尾
-	TX_BUF[len+1]='!';
+	TX_BUF[len+1]=DBUS_END;
 	//调用发送回调函数
-	dbus_callback_table(TX_BUF);
+	SEND_CALLBACK(TX_BUF);
 	
 	//释放动态开辟的空间
 	free(TX_BUF);
@@ -94,27 +72,197 @@ void Send(char* buf,u8 len)
 }
 
 
+
+
+/*********将16进制字符串转数值******************************************************************/
+void HexStrToDec(char* str,char* dec)
+{
+	char temp[2];
+	u8 l;
+	l=strlen(str);
+	for(int i=0;i<l ;i++)
+	{
+		temp[0]=str[i+0];
+		temp[1]=str[i+1];
+		sscanf(temp,"%x",&dec[i/2]);
+		i++;
+	}
+}
+
+
+void RecFuc1(char *buf ,u8 len);
+void RecFuc2(char *buf ,u8 len);
+void RecFuc3(char *buf ,u8 len);
+void RecFuc4(char *buf ,u8 len);
+
+/**********公共函数*******************************************************************/
 Dbus::Dbus(u16 LocalAddress) 
 {
+	//本机地址
 	this->LocalAddress = LocalAddress;
-};
+}
 
-void Dbus::InPut(char* str) 
+
+void Dbus::InPut(char c) 
 {
-	//触发中断
-	dbus_callback_table(str);
-};
+	//将收到的数据追加到接收缓存
+	DBUS_RECIVE_BUF[DBUS_RECIVE_LEN++] = c;
+	//收到结束符触发解包函数
+	if (DBUS_RECIVE_BUF[DBUS_RECIVE_LEN - 1] == DBUS_END)
+	{
+		OpenBox();
+	}
+}
 
-/**
- *@name     void USART::attach_rx_interrupt(void (*callback_fun)(void))
- *@brief    绑定串口接收中断所调用的用户程序
- *@param    callback_fun:  用户函数
- *@retval   None
+
+/*********解包函数******************************************************************/
+void Dbus::OpenBox()
+{
+	char* p;
+	//向前移动的长度
+	u8 MOVE_LEN=0;
+	//单帧临时数组
+	char temp[DBUS_MAX_LENGTH];
+	//单帧转换后的数组
+	char buf[DBUS_MAX_LENGTH];
+	
+	//初步排除无效数据(如果第一个开始符前有数据，则清除)
+	p = strchr(DBUS_RECIVE_BUF,DBUS_HEAD);
+	if (p)
+	{
+		//用MOVE_LEN记住移动前的数量
+		MOVE_LEN = DBUS_RECIVE_LEN;
+		//更新接收数量
+		DBUS_RECIVE_LEN -= p - DBUS_RECIVE_BUF;
+		//移动的数量
+		MOVE_LEN=MOVE_LEN-DBUS_RECIVE_LEN;
+		//移动有效数据
+		for (int i = 0; i < DBUS_RECIVE_LEN; i++)
+		{
+			DBUS_RECIVE_BUF[i] = DBUS_RECIVE_BUF[i + p - DBUS_RECIVE_BUF];
+		}
+		//清除剩余数据
+		for (int i = 0; i < MOVE_LEN; i++)
+		{
+			DBUS_RECIVE_BUF[i+DBUS_RECIVE_LEN] = 0;
+		}
+	}
+	
+	//循环搜索并解析有效数据
+	while (DBUS_RECIVE_LEN > 0)
+	{
+		if (1 == sscanf(DBUS_RECIVE_BUF,DBUS_REGEX,temp))//
+		{
+			//由于上面条件的正则不判断是否有截止符，因此需满足以下条件(包含结束符)
+			if(strchr(DBUS_RECIVE_BUF, DBUS_END))
+			{
+				//将分包的十六进制字符串temp转换为数值数组buf
+				HexStrToDec(temp,buf);
+				//执行解析函数
+				Analyze(buf,strlen(temp));
+				//清除第一个结束符之前的数据（已经使用过及之前的无效数据）
+				p = strchr(DBUS_RECIVE_BUF, DBUS_END);
+				if (p)
+				{
+					//用MOVE_LEN记住移动前的数量
+					MOVE_LEN=DBUS_RECIVE_LEN;
+					//更新接收数量
+					DBUS_RECIVE_LEN -= p - DBUS_RECIVE_BUF + 1;
+					//移动的数量
+					MOVE_LEN=MOVE_LEN-DBUS_RECIVE_LEN;
+					if (DBUS_RECIVE_LEN > 0)
+					{
+						//移动有效数据
+						for (int i = 0; i < DBUS_RECIVE_LEN; i++)
+						{
+							DBUS_RECIVE_BUF[i] = DBUS_RECIVE_BUF[i + p - DBUS_RECIVE_BUF + 1];
+						}
+						//清除剩余数据
+						for (int i = 0; i < MOVE_LEN; i++)
+						{
+							DBUS_RECIVE_BUF[i+DBUS_RECIVE_LEN] = 0;
+						}
+					}
+					else
+					{
+						//避免出现负数
+						DBUS_RECIVE_LEN=0;
+					}
+				}
+			}
+			else
+			{
+				break;
+			}
+		}
+	}
+}
+
+
+
+/*校验并解析数据帧
+ *@Return          NONE 
+*/
+void Dbus::Analyze(char *buf ,u8 len)
+{
+	u16 CRC;
+	u8 C1,C2;
+	
+	//判断目标地址是否为本机
+	if(((buf[3]<<8)|buf[4]) == LocalAddress)
+	{
+		//CRC校验
+		CRC=CRC_CALC(buf,(len-2));  
+		C1=CRC>>8; //CRC高字节
+		C2=CRC;    //CRC低字节
+		if(C1==buf[len-2]&&C2==buf[len-1])//校验正确
+		{		
+			//解析
+			if(buf[2]==1)//操作帧
+			{
+				switch(buf[5])//功能码
+				{
+					case 0x01:RecFuc1(buf,len);break; //读单个寄存器
+					case 0x02:RecFuc2(buf,len);break; //写单个寄存器				      
+					case 0x03:RecFuc3(buf,len);break; //读多个寄存器
+					case 0x04:RecFuc4(buf,len);break; //写多个寄存器
+					default:					break;  	
+				}	
+			}  
+			else 
+			if(buf[2]==2)//响应帧
+			{
+				//添加到响应帧缓冲池
+				for(int i=0;i<DBUS_MAX_RESPONSE_BUF;i++)
+				{
+					//将响应帧编入空闲的响应帧缓冲池
+					if(DBUS_RESPONSE_BUF[i][0]==0)
+					{
+						//缓冲池第一字节为帧长度
+						DBUS_RESPONSE_BUF[i][0] = len;
+						//将该响应帧加入缓冲池
+						for(int j=0;i<len;j++)
+							DBUS_RESPONSE_BUF[i][j+1] = buf[j];
+					}
+				}
+			}
+		} 
+		
+	}
+}
+
+
+/*发送中断函数定义
+ *@Function        初始化发送中断函数
+ *@callback_fun    目标函数
+ *@Return          NONE 
 */
 void Dbus::OutPut_interrupt(void (*callback_fun)(char*))
 {
-	dbus_callback_table = callback_fun;
+	SEND_CALLBACK = callback_fun;
 }
+
+
 
 /*写单个寄存器
  *@Function        给单个寄存器写值
@@ -125,57 +273,59 @@ void Dbus::OutPut_interrupt(void (*callback_fun)(char*))
 */
 u8 Dbus::Write_Register(u16 TargetAddress,u16 RegisterAddress,u16 Data)//写单个寄存器
 {
-//	u16 crctemp=0;
-//	u16 j,timeout,num=0;
-//	
-//	char BUF[12];
-//	
-//	for(j=0;j<repeatNum; j++)
-//	{
-//		BUF[0] = DbusLocalAddress>>8;//本机地址高
-//		BUF[1] = DbusLocalAddress;//本机地址低
-//		BUF[2] = 1;//帧类型
-//		BUF[3] = DstAdress>>8;//目标地址高
-//		BUF[4] = DstAdress;//目标地址低
-//		BUF[5] = 2;//功能码
-//		BUF[6] = RegisterAdress>>8;//寄存器地址高
-//		BUF[7] = RegisterAdress;//寄存器地址低
-//		BUF[8] = data>>8;//数据高
-//		BUF[9] = data;//数据低
-//	 
-//		crctemp=dbus_CalcCrc(BUF,10);
-//		
-//		BUF[10] = crctemp>>8;//CRC高
-//		BUF[11] = crctemp;//CRC低
-//		
-//		SendToSever(BUF,12);
-//		//等待响应
-//		timeout=0;
-//		while(response==0&&(timeout<responseTime/10))
-//		{
-//			timeout++;
-//			delay_ms(10);
-//		}
-//		if(timeout<(responseTime/10))//正常响应，结束
-//		{
-//			j = repeatNum;
-//			response = 0;		
-//			return 1;
-//		}
-//		
-//		//已重发次数加一
-//		num++;
-//		
-//		if(timeout<(responseTime/10))//超时
-//		{
-//			if(num==repeatNum)//重发次数到达上限，发送失败，返回0
-//			{
-//				return 0;
-//			}
-//		}
-//	}
+	u16 CRC=0;
+	u16 j,timeout,num=0;
+	
+	char TX_BUF[12];
+	
+	for(j=0;j<DBUS_MAX_REPEAT_NUM; j++)
+	{
+		TX_BUF[0] = LocalAddress>>8;//本机地址高
+		TX_BUF[1] = LocalAddress;//本机地址低
+		TX_BUF[2] = 1;//帧类型
+		TX_BUF[3] = TargetAddress>>8;//目标地址高
+		TX_BUF[4] = TargetAddress;//目标地址低
+		TX_BUF[5] = 2;//功能码
+		TX_BUF[6] = RegisterAddress>>8;//寄存器地址高
+		TX_BUF[7] = RegisterAddress;//寄存器地址低
+		TX_BUF[8] = Data>>8;//数据高
+		TX_BUF[9] = Data;//数据低
+	 
+		CRC=CRC_CALC(TX_BUF,10);
+		
+		TX_BUF[10] = CRC>>8;//CRC高
+		TX_BUF[11] = CRC;//CRC低
+		
+		Send(TX_BUF,12);
+
+		//等待响应
+		timeout=0;
+		while(response==0&&(timeout<responseTime/10))
+		{
+			timeout++;
+			delay_ms(10);
+		}
+		if(timeout<(responseTime/10))//正常响应，结束
+		{
+			j = repeatNum;
+			response = 0;		
+			return 1;
+		}
+		
+		//已重发次数加一
+		num++;
+		
+		if(timeout<(responseTime/10))//超时
+		{
+			if(num==repeatNum)//重发次数到达上限，发送失败，返回0
+			{
+				return 0;
+			}
+		}
+	}
 	return 1;
 }
+
 
 
 /*心跳函数
@@ -212,41 +362,49 @@ void Dbus::Heart(u16 TargetAddress)//心跳函数
 
 
 
-///// <summary>
-///// 写单个字到目标地址
-///// </summary>
-///// <param name="DstAdress">目标地址</param>
-///// <param name="RegisterAdress">寄存器地址</param>
-///// <param name="Data">待写入数据</param>
-//u8 Write_Word(u16 DstAdress,u16 RegisterAdress,u16 data)//写单个寄存器
-//{
+
+
+
+/// <summary>
+/// 写多个字到目标地址
+/// </summary>
+/// <param name="DstAdress">目标地址</param>
+/// <param name="RegisterAdress">寄存器起始地址</param>
+/// <param name="Num">寄存器数量</param>
+/// <param name="Data">待写入数据指针</param>
+u8 Write_MultipleWord(u16 DstAdress,u16 RegisterAdress,u8 Num,u16* Data)//写单个寄存器
+{
 //	u16 crctemp=0;
-//	u16 j,timeout,num=0;
-//	
-//	char BUF[12];
-//	
+//	u16 i = 0,j,timeout,num=0;
 //	for(j=0;j<repeatNum; j++)
 //	{
-//		BUF[0] = DbusLocalAddress>>8;//本机地址高
-//		BUF[1] = DbusLocalAddress;//本机地址低
-//		BUF[2] = 1;//帧类型
-//		BUF[3] = DstAdress>>8;//目标地址高
-//		BUF[4] = DstAdress;//目标地址低
-//		BUF[5] = 2;//功能码
-//		BUF[6] = RegisterAdress>>8;//寄存器地址高
-//		BUF[7] = RegisterAdress;//寄存器地址低
-//		BUF[8] = data>>8;//数据高
-//		BUF[9] = data;//数据低
+//		Dbus_TX_BUF[0] = DbusLocalAddress>>8;//本机地址高
+//		Dbus_TX_BUF[1] = DbusLocalAddress;//本机地址低
+//		Dbus_TX_BUF[2] = 1;//帧类型
+//		Dbus_TX_BUF[3] = DstAdress>>8;//目标地址高
+//		Dbus_TX_BUF[4] = DstAdress;//目标地址低
+//		Dbus_TX_BUF[5] = 4;//功能码
+//		Dbus_TX_BUF[6] = RegisterAdress>>8;//寄存器地址高
+//		Dbus_TX_BUF[7] = RegisterAdress;//寄存器地址低
+//		Dbus_TX_BUF[8] = Num;//寄存器数量
+
+//		//循环写入数据到发送缓冲区
+//		for(i=0;i<Num;i++)
+//		{
+//			Dbus_TX_BUF[9+2*i] = Data[i]>>8;//数据高
+//			Dbus_TX_BUF[10+2*i] = Data[i];//数据低
+//		}
 //	 
-//		crctemp=dbus_CalcCrc(BUF,10);
+//		crctemp=dbus_CalcCrc(Dbus_TX_BUF,9+2*Num);
 //		
-//		BUF[10] = crctemp>>8;//CRC高
-//		BUF[11] = crctemp;//CRC低
-//		
-//		SendToSever(BUF,12);
+//		Dbus_TX_BUF[8+2*Num+1] = crctemp>>8;//CRC高
+//		Dbus_TX_BUF[8+2*Num+2] = crctemp;//CRC低
+
+//		uart.printf_length(Dbus_TX_BUF,9+2*Num+2);
+
 //		//等待响应
 //		timeout=0;
-//		while(response==0&&(timeout<responseTime/10))
+//		while(response==0&&(timeout<responseTime/10))//
 //		{
 //			timeout++;
 //			delay_ms(10);
@@ -269,129 +427,24 @@ void Dbus::Heart(u16 TargetAddress)//心跳函数
 //			}
 //		}
 //	}
-//	return 1;
-//}
+	return 1;
+}
 
 
-///// <summary>
-///// 写多个字到目标地址
-///// </summary>
-///// <param name="DstAdress">目标地址</param>
-///// <param name="RegisterAdress">寄存器起始地址</param>
-///// <param name="Num">寄存器数量</param>
-///// <param name="Data">待写入数据指针</param>
-//u8 Write_MultipleWord(u16 DstAdress,u16 RegisterAdress,u8 Num,u16* Data)//写单个寄存器
-//{
-////	u16 crctemp=0;
-////	u16 i = 0,j,timeout,num=0;
-////	for(j=0;j<repeatNum; j++)
-////	{
-////		Dbus_TX_BUF[0] = DbusLocalAddress>>8;//本机地址高
-////		Dbus_TX_BUF[1] = DbusLocalAddress;//本机地址低
-////		Dbus_TX_BUF[2] = 1;//帧类型
-////		Dbus_TX_BUF[3] = DstAdress>>8;//目标地址高
-////		Dbus_TX_BUF[4] = DstAdress;//目标地址低
-////		Dbus_TX_BUF[5] = 4;//功能码
-////		Dbus_TX_BUF[6] = RegisterAdress>>8;//寄存器地址高
-////		Dbus_TX_BUF[7] = RegisterAdress;//寄存器地址低
-////		Dbus_TX_BUF[8] = Num;//寄存器数量
-
-////		//循环写入数据到发送缓冲区
-////		for(i=0;i<Num;i++)
-////		{
-////			Dbus_TX_BUF[9+2*i] = Data[i]>>8;//数据高
-////			Dbus_TX_BUF[10+2*i] = Data[i];//数据低
-////		}
-////	 
-////		crctemp=dbus_CalcCrc(Dbus_TX_BUF,9+2*Num);
-////		
-////		Dbus_TX_BUF[8+2*Num+1] = crctemp>>8;//CRC高
-////		Dbus_TX_BUF[8+2*Num+2] = crctemp;//CRC低
-
-////		uart.printf_length(Dbus_TX_BUF,9+2*Num+2);
-
-////		//等待响应
-////		timeout=0;
-////		while(response==0&&(timeout<responseTime/10))//
-////		{
-////			timeout++;
-////			delay_ms(10);
-////		}
-////		if(timeout<(responseTime/10))//正常响应，结束
-////		{
-////			j = repeatNum;
-////			response = 0;		
-////			return 1;
-////		}
-////		
-////		//已重发次数加一
-////		num++;
-////		
-////		if(timeout<(responseTime/10))//超时
-////		{
-////			if(num==repeatNum)//重发次数到达上限，发送失败，返回0
-////			{
-////				return 0;
-////			}
-////		}
-////	}
-//	return 1;
-//}
-
-//void AnalyzeDbus() //分析并生成响应报文
-//{
-//	u16 crc;
-//	u8 c1,c2;
-//	
-//	//判断目标地址
-//	if(((Dbus_Recive[3]<<8)|Dbus_Recive[4])==DbusLocalAddress)
-//	{
-//		//CRC校验
-//		crc=dbus_CalcCrc(Dbus_Recive,(dbus_recivelength-2));  
-//		c1=crc>>8; //CRC高字节
-//		c2=crc;    //CRC低字节
-//		if(c1==Dbus_Recive[dbus_recivelength-2]&&c2==Dbus_Recive[dbus_recivelength-1])//校验正确
-//		{		
-//			//解析
-//			if(Dbus_Recive[2]==1)//操作帧
-//			{
-//				switch(Dbus_Recive[5])//功能码
-//				{
-//					case 0x01:RecFuc1();break;         //读单个寄存器
-//					case 0x02:RecFuc2();break;         //写单个寄存器				      
-//					case 0x03:RecFuc3();break;	       //读多个寄存器
-//					case 0x04:RecFuc4();break;         //写多个寄存器
-//					default:					break;  	
-//				}	
-//			}  
-//			else 
-//			if(Dbus_Recive[2]==2)//响应帧
-//			{
-//				response = 1;
-//			}
-//		} 
-//		
-//	}
-//}
 
 
-///*从机响应函数*/
 
-//void send2_comm( void )
-//{
-//	
-//}
 
-///*分析01功能码*/ 
-//void RecFuc1()
-// {
+/*读单个寄存器*/ 
+void RecFuc1(char *buf ,u8 len)
+ {
 
-// } 
-//	  
+ } 
+	  
 
-///*分析02写单个寄存器*/ 
-//void RecFuc2()
-// {
+/*写单个寄存器*/ 
+void RecFuc2(char *buf ,u8 len)
+ {
 //	 u16 startadd;//待写入寄存器地址
 //	 u16 data;//待写入数据
 //	 
@@ -402,19 +455,19 @@ void Dbus::Heart(u16 TargetAddress)//心跳函数
 //	 	 
 //	 //回复响应帧
 //	 responsedata((Dbus_Recive[0]<<8)|Dbus_Recive[1],Dbus_Recive[5],1);
-// } 
-//	
+ } 
+	
 
 
-///*分析03功能码报文*/ 
-//void RecFuc3()
-// {
+/*读多个寄存器*/ 
+void RecFuc3(char *buf ,u8 len)
+ {
 
-// }
-// 
-///*分析04写多个寄存器*/ 
-//void RecFuc4()
-// {
+ }
+ 
+/*写多个寄存器*/ 
+void RecFuc4(char *buf ,u8 len)
+ {
 //	 u16 startadd;//待写入寄存器地址
 //	 u16 len;//待写入数据长度
 //	 u16 i;
@@ -427,7 +480,7 @@ void Dbus::Heart(u16 TargetAddress)//心跳函数
 //	 
 //	 //回复响应帧
 //	 responsedata((Dbus_Recive[0]<<8)|Dbus_Recive[1],Dbus_Recive[5],1);
-// }  
+ }  
 
 
 ///// <summary>
@@ -455,21 +508,7 @@ void Dbus::Heart(u16 TargetAddress)//心跳函数
 ////	uart.printf_length(Dbus_TX_BUF,9);
 //}
 
-///*错误返回*/
-//void errorsend2(u8 func,u8 type)
-//{
 
-//}
-
-// 
-
-
-//void clear_rxBuf2()
-//{
-//	u16 i=0;
-//	for(i=0;i<dbus_recivelength;i++)
-//			Dbus_Recive[i]=	0;
-//}
 ////src:指令
 ////dst:返回信息
 ////timeout:超时时间

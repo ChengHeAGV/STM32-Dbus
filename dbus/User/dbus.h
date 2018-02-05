@@ -24,18 +24,23 @@
 
 /*--- 用户配置 ---------------------------------------------------------------*/
 //单帧数据帧最大长度
-#define DBUS_MAX_LENGTH 128
+#define DBUS_MAX_LENGTH 256
 //数据接收缓冲池长度
 #define DBUS_MAX_RECIVE_BUF 1024
 //响应消息队列缓冲池长度
-#define DBUS_MAX_RESPONSE_BUF 20 
-
+#define DBUS_MAX_RESPONSE_BUF 20
+//最大重发次数
+#define DBUS_MAX_REPEAT_NUM 3
 class Dbus
 {
 	public:
 		Dbus(u16 LocalAddress);
 		//输入数据
-		void InPut(char* str);
+		void InPut(char c);
+		//解包函数
+	  void OpenBox();
+		//解析函数
+	  void Analyze(char *buf ,u8 len);
 		//输出数据中断
 		void OutPut_interrupt(void (*callback_fun)(char*));
 		//心跳函数
@@ -47,6 +52,7 @@ class Dbus
 	private:
 		//本机地址
 		u16 LocalAddress;
+		u16 DBUS_RECIVE_LEN;
 		//数据接收缓冲池
 		char DBUS_RECIVE_BUF[DBUS_MAX_RECIVE_BUF];
 		//响应消息队列缓冲池长度
