@@ -19,61 +19,70 @@
 #ifndef __DBUS_H
 #define	__DBUS_H
 
-/*--- Includes ---------------------------------------------------------------*/
-//#include "ebox.h"
-
-/*--- 用户配置 ---------------------------------------------------------------*/
-#define UART_MAX_SEND_BUF 128
-
 #define u8 char
 #define u16 unsigned short
+
+/*--- 用户配置 ---------------------------------------------------------------*/
+//单帧数据帧最大长度
+#define DBUS_MAX_LENGTH 128
+//数据接收缓冲池长度
+#define DBUS_MAX_RECIVE_BUF 1024
+//响应消息队列缓冲池长度
+#define DBUS_MAX_RESPONSE_BUF 20 
 
 class Dbus
 {
 	public:
-			Dbus();
-			//输入数据
-			void InPut(char* str);
-			//输出数据中断
-	    void OutPut_interrupt(void (*callback_fun)(void));
-			u8 Write_Word(u16 DstAdress,u16 RegisterAdress,u16 data);
-			
+		Dbus(u16 LocalAddress);
+		//输入数据
+		void InPut(char* str);
+		//输出数据中断
+		void OutPut_interrupt(void (*callback_fun)(char*));
+		//心跳函数
+		void Heart(u16 TargetAddress);
+		//写单个寄存器
+		u8 Write_Register(u16 TargetAddress,u16 RegisterAddress,u16 Data);
+		//写多个寄存器
+		u8 Write_Multiple_Registers(u16 TargetAddress,u16 RegisterAddress,u8 Num,u16* Data);	
 	private:
-			u16 DstAdress;
-			u16 RegisterAdress;
-			u16 data;
+		//本机地址
+		u16 LocalAddress;
+		//数据接收缓冲池
+		char DBUS_RECIVE_BUF[DBUS_MAX_RECIVE_BUF];
+		//响应消息队列缓冲池长度
+		char DBUS_RESPONSE_BUF[DBUS_MAX_RESPONSE_BUF][DBUS_MAX_LENGTH];
 };
 
-extern char Dbus_Recive[100];//接收数组
-extern u16 dbus_recivelength;//接收长度
-void Heart(void);//心跳函数
-u8 Write_Word(u16 DstAdress,u16 RegisterAdress,u16 data);//写单个寄存器
-u8 Write_MultipleWord(u16 DstAdress,u16 RegisterAdress,u8 Num,u16* Data);//写单个寄存器
-void AnalyzeDbus(void);   
-u16 dbus_CalcCrc(char *chData,unsigned short uNo);
-void responsedata(u16 DstAdress,u8 func,u8 resault);//响应帧
+//extern char Dbus_Recive[100];//接收数组
+//extern u16 dbus_recivelength;//接收长度
+//void Heart(void);//心跳函数
+//u8 Write_Word(u16 DstAdress,u16 RegisterAdress,u16 data);//写单个寄存器
+//u8 Write_MultipleWord(u16 DstAdress,u16 RegisterAdress,u8 Num,u16* Data);//写单个寄存器
+//void AnalyzeDbus(void);   
+//u16 dbus_CalcCrc(char *chData,unsigned short uNo);
+//void responsedata(u16 DstAdress,u8 func,u8 resault);//响应帧
 
 
 
 
 
                            
-void send2_comm(void);
-void RecFuc1(void);
-void RecFuc2(void);
-void RecFuc3(void);
-void RecFuc4(void);
-void errorsend2(u8 func,u8 type);
+//void send2_comm(void);
+//void RecFuc1(void);
+//void RecFuc2(void);
+//void RecFuc3(void);
+//void RecFuc4(void);
+//void errorsend2(u8 func,u8 type);
 
-void Send_02(u16 adress,u16 data);//写单个寄存器
-	
-extern u16 Dbus_Data[100];//寄存器
-extern u16 DbusLocalAddress;//本机地址
+//void Send_02(u16 adress,u16 data);//写单个寄存器
+//	
+//extern u16 Dbus_Data[100];//寄存器
+//extern u16 DbusLocalAddress;//本机地址
 
-int check(char* dst,u16 timeout,char* src,...);
+//int check(char* dst,u16 timeout,char* src,...);
 
-u16 ComperStr(u16 RegisterAdress,char* str);
-u16 WriteStr(u16 DstAdress,u16 RegisterAdress,char* str);
+//u16 ComperStr(u16 RegisterAdress,char* str);
+//u16 WriteStr(u16 DstAdress,u16 RegisterAdress,char* str);
 
 
 #endif

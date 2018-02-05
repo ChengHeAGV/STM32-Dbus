@@ -1,0 +1,67 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Tool Versions:</h2>
+IDE-Version: ¦ÌVision V5.14.0.0
+Copyright (C) 2015 ARM Ltd and ARM Germany GmbH. All rights reserved.
+License Information: asd AutoBVT, Microsoft, LIC=Z3C63-AYI5J-LVU1I-T3MDI-PD1A6-PPKQ1
+ 
+Tool Versions:
+Toolchain:       MDK-ARM Professional  Version: 5.14.0.0
+Toolchain Path:  C:\Keil_v5\ARM\ARMCC\Bin
+C Compiler:      Armcc.exe V5.05 update 1 (build 106)
+Assembler:       Armasm.exe V5.05 update 1 (build 106)
+Linker/Locator:  ArmLink.exe V5.05 update 1 (build 106)
+Library Manager: ArmAr.exe V5.05 update 1 (build 106)
+Hex Converter:   FromElf.exe V5.05 update 1 (build 106)
+CPU DLL:         SARMCM3.DLL V5.14.0.0
+Dialog DLL:      DCM.DLL V1.13.1.0
+Target DLL:      Segger\JL2CM3.dll V2.99.13.0
+Dialog DLL:      TCM.DLL V1.14.4.0
+ 
+<h2>Project:</h2>
+D:\github\stm32\dbus\dbus\Project\stm32f4xx\mdk\stm32f4xx.uvprojx
+Project File Date:  02/05/2018
+
+<h2>Output:</h2>
+Build target 'STM32F4'
+compiling main.cpp...
+..\..\..\User\main.cpp(36): warning:  #181-D: argument is incompatible with corresponding format string conversion
+                sscanf(temp,"%x",&dec[i/2]);
+..\..\..\User\main.cpp(28): warning:  #177-D: variable "i" was declared but never referenced
+        u16 i = 0;
+..\..\..\User\main.cpp(179): warning:  #177-D: variable "ss" was declared but never referenced
+        char ss[] = "123410042B66";
+..\..\..\User\main.cpp: 3 warnings, 0 errors
+compiling dbus.cpp...
+..\..\..\User\dbus.cpp(72): error:  #28: expression must have a constant value
+        char TX_BUF[len+2];
+..\..\..\User\dbus.cpp(73): error:  #28: expression must have a constant value
+        unsigned int TEMP[len];
+..\..\..\User\dbus.cpp(70): warning:  #177-D: variable "i" was declared but never referenced
+        u8 i;
+..\..\..\User\dbus.cpp: 1 warning, 2 errors
+".\Output\ebox_stm32f4xx.axf" - 2 Error(s), 4 Warning(s).
+
+<h2>Software Packages used:</h2>
+
+Package Vendor: ARM
+                http://www.keil.com/pack/ARM.CMSIS.4.2.0.pack
+                ARM::CMSIS:CORE:3.40.0
+                CMSIS (Cortex Microcontroller Software Interface Standard)
+   * Component: CORE Version: 3.40.0
+
+<h2>Collection of Component include folders:</h2>
+  D:\github\stm32\dbus\dbus\Project\stm32f4xx\mdk\RTE
+  C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include
+  C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.7.0
+
+<h2>Collection of Component Files used:</h2>
+
+   * Component: ARM::CMSIS:CORE:3.40.0
+      Source file:   CMSIS\UserCodeTemplates\ARM\ITM_Retarget.c
+Target not created.
+</pre>
+</body>
+</html>

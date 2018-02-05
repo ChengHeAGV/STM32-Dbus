@@ -174,7 +174,7 @@ void led()
 //char s[]="ttt=eee&name=aaaaaaaaaaa&pass=bbbbbgbb&usession=undefined";
 //char s[] = "03$0382!$014c!$045d!$0";
 char s[] = "123410042B66";
-void dbus_test()
+void dbus_test(char* buf)
 {
 	char ss[] = "123410042B66";
 
@@ -183,8 +183,8 @@ void dbus_test()
 int main(void)
 {
 	u16 i = 0;
-	Dbus dbus;
-	dbus.Write_Word(1,1,1);
+	Dbus dbus(1);
+	dbus.Write_Register(1,1,1);
 	dbus.OutPut_interrupt(dbus_test);
 	
 	dbus.InPut("a");
@@ -195,7 +195,7 @@ int main(void)
 	while (1)
 	{
 		//uart2.printf("uart is ok ! count = %d\r\n", count);
-		Heart();
+		dbus.Heart(1);
 		led();
 		delay_ms(10);
 		//		Heart();
@@ -203,7 +203,7 @@ int main(void)
 		//delay_ms(100);
 		for (i = 0; i < 100; i++)
 		{
-			Write_Word(4, i, random(0xff));
+			dbus.Write_Register(4, i, random(0xff));
 			led();
 			//delay_ms(10);
 		}
