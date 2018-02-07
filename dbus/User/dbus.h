@@ -29,7 +29,9 @@
 #define DBUS_MAX_RECIVE_BUF 1024
 //响应消息队列缓冲池长度
 #define DBUS_MAX_RESPONSE_BUF 20
-//最大重发次数
+//超时时间(单位:ms)
+#define DBUS_TIMEOUT 200
+//重发次数
 #define DBUS_MAX_REPEAT_NUM 3
 class Dbus
 {
@@ -43,6 +45,8 @@ class Dbus
 	  void Analyze(char *buf ,u8 len);
 		//输出数据中断
 		void OutPut_interrupt(void (*callback_fun)(char*));
+		//延时中断
+		void Delay_interrupt(void (*callback_delay)(void));
 		//心跳函数
 		void Heart(u16 TargetAddress);
 		//写单个寄存器
@@ -52,6 +56,7 @@ class Dbus
 	private:
 		//本机地址
 		u16 LocalAddress;
+		//接收缓冲池数据长度
 		u16 DBUS_RECIVE_LEN;
 		//数据接收缓冲池
 		char DBUS_RECIVE_BUF[DBUS_MAX_RECIVE_BUF];

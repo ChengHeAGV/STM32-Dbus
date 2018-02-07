@@ -76,14 +76,17 @@ void dbus_test(char* buf)
 	//char ss[] = "123410042B66";
 
 }
-
+void dbus_delay()
+{
+	delay_ms(1);
+}
 int main(void)
 {
 	u16 i = 0;
 	Dbus dbus(1);
 	dbus.Write_Register(1,1,1);
 	dbus.OutPut_interrupt(dbus_test);
-	
+	dbus.Delay_interrupt(dbus_delay);
 	dbus.InPut('a');
 	
 	//OpenBox();
