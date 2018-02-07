@@ -274,7 +274,30 @@ void Dbus::Delay_interrupt(void (*callback_delay)(void))
 {
 	DELAY_CALLBACK = callback_delay;
 }
-
+/*ÐÄÌøº¯Êý
+ *@Function        ¶¨Ê±»ã±¨Éè±¸ÔÚÏß
+ *@TargetAdress    Ä¿±êÉè±¸ºÅ     
+ *@Return          1:»ã±¨³É¹¦£¬0:»ã±¨Ê§°Ü  
+*/
+void Dbus::Heart(u16 TargetAddress)//ÐÄÌøº¯Êý
+{
+	//Êý¾Ý·¢ËÍÁÙÊ±Êý×é
+	char TX_BUF[7];
+	//´æ´¢CRC¼ÆËã½á¹ûÁÙÊ±±äÁ¿
+	u16 CRC;
+	TX_BUF[0] = LocalAddress >>8;//±¾»úµØÖ·¸ß
+	TX_BUF[1] = LocalAddress;//±¾»úµØÖ·µÍ
+	TX_BUF[2] = 0;//Ö¡ÀàÐÍ
+	TX_BUF[3] = 0;//Ä¿±êµØÖ·¸ß
+	TX_BUF[4] = 1;//Ä¿±êµØÖ·µÍ
+	
+	CRC=CRC_CALC(TX_BUF,5);
+	
+	TX_BUF[5] = CRC>>8;//CRC¸ß
+	TX_BUF[6] = CRC;   //CRCµÍ
+	
+	Send(TX_BUF,7);
+}
 /*Ð´µ¥¸ö¼Ä´æÆ÷
  *@Function        ¸øµ¥¸ö¼Ä´æÆ÷Ð´Öµ
  *@TargetAdress    Ä¿±êÉè±¸µØÖ·
@@ -308,7 +331,7 @@ u8 Dbus::Write_Register(u16 TargetAddress,u16 RegisterAddress,u16 Data)//Ð´µ¥¸ö¼
 	TX_BUF[12] = CRC>>8;//CRC¸ß
 	TX_BUF[13] = CRC;//CRCµÍ	
 		
-	for(j=0;j<DBUS_MAX_REPEAT_NUM; j++)
+	for(int j=0;j<DBUS_MAX_REPEAT_NUM; j++)
 	{
 		//·¢ËÍÊý¾Ý
 		Send(TX_BUF,14);
@@ -336,42 +359,6 @@ u8 Dbus::Write_Register(u16 TargetAddress,u16 RegisterAddress,u16 Data)//Ð´µ¥¸ö¼
 
 
 
-/*ÐÄÌøº¯Êý
- *@Function        ¶¨Ê±»ã±¨Éè±¸ÔÚÏß
- *@TargetAdress    Ä¿±êÉè±¸ºÅ     
- *@Return          1:»ã±¨³É¹¦£¬0:»ã±¨Ê§°Ü  
-*/
-void Dbus::Heart(u16 TargetAddress)//ÐÄÌøº¯Êý
-{
-	//Êý¾Ý·¢ËÍÁÙÊ±Êý×é
-	char TX_BUF[7];
-	//´æ´¢CRC¼ÆËã½á¹ûÁÙÊ±±äÁ¿
-	u16 CRC;
-	TX_BUF[0] = LocalAddress >>8;//±¾»úµØÖ·¸ß
-	TX_BUF[1] = LocalAddress;//±¾»úµØÖ·µÍ
-	TX_BUF[2] = 0;//Ö¡ÀàÐÍ
-	TX_BUF[3] = 0;//Ä¿±êµØÖ·¸ß
-	TX_BUF[4] = 1;//Ä¿±êµØÖ·µÍ
-	
-	CRC=CRC_CALC(TX_BUF,5);
-	
-	TX_BUF[5] = CRC>>8;//CRC¸ß
-	TX_BUF[6] = CRC;   //CRCµÍ
-	
-	Send(TX_BUF,7);
-}
-
-
-
-
-
-
-
-
-
-
-
-
 
 /*Ð´¶à¸ö¼Ä´æÆ÷
  *@TargetAdress    Ä¿±êÉè±¸µØÖ·
@@ -380,17 +367,17 @@ void Dbus::Heart(u16 TargetAddress)//ÐÄÌøº¯Êý
  *@Data            ´ýÐ´ÈëÊýÖµÖ¸Õë
  *@Return          1:Ð´Èë³É¹¦£¬0:Ð´ÈëÊ§°Ü  
 */
-u8 Write_MultipleWord(u16 TargetAdress,u16 RegisterAddress,u8 Num,u16* Data)//Ð´µ¥¸ö¼Ä´æÆ÷
+u8 Dbus:: Write_Multiple_Registers(u16 TargetAdress,u16 RegisterAddress,u8 Num,u16* Data)//Ð´µ¥¸ö¼Ä´æÆ÷
 {
 	u16 CRC=0;
-	char TX_BUF[14];
+	char *TX_BUF=(char *)malloc((11+2*Num+2)*sizeof(char));//¶¨Òå¶¯Ì¬Êý×éTX_BUF[11+2*Num+2];
 	FrameID++;
 	u16 frameid = FrameID;
 	
 	TX_BUF[0] = frameid>>8;//Ö¡ID¸ß
 	TX_BUF[1] = frameid;//Ö¡IDµÍ		
-	TX_BUF[2] = DbusLocalAddress>>8;//±¾»úµØÖ·¸ß
-	TX_BUF[3] = DbusLocalAddress;//±¾»úµØÖ·µÍ
+	TX_BUF[2] = LocalAddress>>8;//±¾»úµØÖ·¸ß
+	TX_BUF[3] = LocalAddress;//±¾»úµØÖ·µÍ
 	TX_BUF[4] = 1;//Ö¡ÀàÐÍ
 	TX_BUF[5] = TargetAdress>>8;//Ä¿±êµØÖ·¸ß
 	TX_BUF[6] = TargetAdress;//Ä¿±êµØÖ·µÍ
@@ -400,7 +387,7 @@ u8 Write_MultipleWord(u16 TargetAdress,u16 RegisterAddress,u8 Num,u16* Data)//Ð´
 	TX_BUF[10] = Num;//¼Ä´æÆ÷ÊýÁ¿
 
 	//Ñ­»·Ð´ÈëÊý¾Ýµ½·¢ËÍ»º³åÇø
-	for(i=0;i<Num;i++)
+	for(int i=0;i<Num;i++)
 	{
 		TX_BUF[11+2*i] = Data[i]>>8;//Êý¾Ý¸ß
 		TX_BUF[12+2*i] = Data[i];//Êý¾ÝµÍ
@@ -408,58 +395,44 @@ u8 Write_MultipleWord(u16 TargetAdress,u16 RegisterAddress,u8 Num,u16* Data)//Ð´
 
 	CRC=CRC_CALC(TX_BUF,11+2*Num);
 
-	TX_BUF[8+2*Num+1] = CRC>>8;//CRC¸ß
-	TX_BUF[8+2*Num+2] = CRC;//CRCµÍ
-
-	uart.printf_length(TX_BUF,9+2*Num+2);
+	TX_BUF[11+2*Num] = CRC>>8;//CRC¸ß
+	TX_BUF[11+2*Num+1] = CRC;//CRCµÍ
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	for(j=0;j<repeatNum; j++)
+	for(int j=0;j<DBUS_MAX_REPEAT_NUM; j++)
 	{
-
-
+		//·¢ËÍÊý¾Ý
+		Send(TX_BUF,11+2*Num+2);
 		//µÈ´ýÏìÓ¦
-		timeout=0;
-		while(response==0&&(timeout<responseTime/10))//
+		for(int k=0;k<DBUS_TIMEOUT;k++)
 		{
-			timeout++;
-			delay_ms(10);
-		}
-		if(timeout<(responseTime/10))//Õý³£ÏìÓ¦£¬½áÊø
-		{
-			j = repeatNum;
-			response = 0;		
-			return 1;
-		}
-		
-		//ÒÑÖØ·¢´ÎÊý¼ÓÒ»
-		num++;
-		
-		if(timeout<(responseTime/10))//³¬Ê±
-		{
-			if(num==repeatNum)//ÖØ·¢´ÎÊýµ½´ïÉÏÏÞ£¬·¢ËÍÊ§°Ü£¬·µ»Ø0
+			for(int i=0;i<DBUS_MAX_RESPONSE_BUF ;i++)
 			{
-				return 0;
+				if(DBUS_RESPONSE_BUF[i][0]!=0)
+				{
+					if(((DBUS_RESPONSE_BUF[i][1]<<8)|DBUS_RESPONSE_BUF[i][2]) == frameid)
+					{
+						DBUS_RESPONSE_BUF[i][0]=0;
+						
+						//ÊÍ·Å¶¯Ì¬¿ª±ÙµÄ¿Õ¼ä
+						free(TX_BUF);
+						/*ÎªÁË·ÀÖ¹Ò°Ö¸Õë²úÉú*/
+						TX_BUF = NULL;
+						return 1;
+					}
+				}
 			}
+			//ÑÓÊ±1ms£¬·ÀÖ¹ÊµÊ±ÏµÍ³µ÷ÓÃÊ±¿¨ËÀ
+			DELAY_CALLBACK();
 		}
 	}
-	return 1;
+	
+	//ÊÍ·Å¶¯Ì¬¿ª±ÙµÄ¿Õ¼ä
+	free(TX_BUF);
+	/*ÎªÁË·ÀÖ¹Ò°Ö¸Õë²úÉú*/
+  TX_BUF = NULL;
+	return 0;
 }
+
 
 
 
@@ -470,8 +443,7 @@ u8 Write_MultipleWord(u16 TargetAdress,u16 RegisterAddress,u8 Num,u16* Data)//Ð´
 void RecFuc1(char *buf ,u8 len)
  {
 
- } 
-	  
+ }   
 
 /*Ð´µ¥¸ö¼Ä´æÆ÷*/ 
 void RecFuc2(char *buf ,u8 len)

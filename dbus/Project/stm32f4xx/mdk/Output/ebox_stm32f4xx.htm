@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Output\ebox_stm32f4xx.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Output\ebox_stm32f4xx.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Wed Feb 07 12:41:40 2018
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Wed Feb 07 13:08:01 2018
 <BR><P>
 <H3>Maximum Stack Usage =       7300 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -1615,7 +1615,7 @@ Global Symbols
 
 <P><STRONG><a name="[166]"></a>Spi::Spi__sub_object(SPI_TypeDef*, Gpio*, Gpio*, Gpio*)</STRONG> (Thumb, 0 bytes, Stack size 12 bytes, ebox_spi.o(i._ZN3SpiC1EP11SPI_TypeDefP4GpioS3_S3_), UNUSED)
 
-<P><STRONG><a name="[f6]"></a>Dbus::Write_Register(unsigned short, unsigned short, unsigned short)</STRONG> (Thumb, 240 bytes, Stack size 56 bytes, dbus.o(i._ZN4Dbus14Write_RegisterEttt))
+<P><STRONG><a name="[f6]"></a>Dbus::Write_Register(unsigned short, unsigned short, unsigned short)</STRONG> (Thumb, 256 bytes, Stack size 56 bytes, dbus.o(i._ZN4Dbus14Write_RegisterEttt))
 <BR><BR>[Stack]<UL><LI>Max Depth = 588<LI>Call Chain = Dbus::Write_Register(unsigned short, unsigned short, unsigned short) &rArr; Send(char*, char) &rArr; __0sscanf &rArr; __vfscanf_char &rArr; __vfscanf &rArr; _scanf_real &rArr; _scanf_really_real &rArr; _fp_value &rArr; _btod_etento &rArr; _btod_emul &rArr; _e2e
 </UL>
 <BR>[Calls]<UL><LI><a href="#[f7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CRC_CALC(char*, unsigned short)
