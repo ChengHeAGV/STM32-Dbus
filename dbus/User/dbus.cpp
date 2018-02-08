@@ -43,10 +43,6 @@ u16 CRC_CALC(char *chData,unsigned short uNo)
 	return (crc);
 }
 
-
-
-
-
 /*********发送函数******************************************************************/
 void Send(char* buf,u8 len)
 {
@@ -74,9 +70,6 @@ void Send(char* buf,u8 len)
   TX_BUF = NULL;
 	TEMP   = NULL;
 }
-
-
-
 
 /*********将16进制字符串转数值******************************************************************/
 void HexStrToDec(char* str,char* dec)
@@ -700,7 +693,7 @@ void Dbus:: Response_Write_Multiple_Registers(char *buf)
 		{
 			TX_BUF[8] = 1;//结果	
 			//更新数据
-			Dbus::Dbus_Register[regStartAdd+i] = buf[11]<<8|buf[12];
+			Dbus::Dbus_Register[regStartAdd+i] = buf[11+i*2]<<8|buf[12+i*2];
 		}
 	}
 
