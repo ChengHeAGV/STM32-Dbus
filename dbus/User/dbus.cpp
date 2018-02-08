@@ -94,11 +94,6 @@ void HexStrToDec(char* str,char* dec)
 }
 
 
-void RecFuc1(char *buf ,u8 len);
-void RecFuc2(char *buf ,u8 len);
-void RecFuc3(char *buf ,u8 len);
-void RecFuc4(char *buf ,u8 len);
-
 /**********公共函数*******************************************************************/
 Dbus::Dbus(u16 LocalAddress) 
 {
@@ -213,7 +208,7 @@ void Dbus::Analyze(char *buf ,u8 len)
 	u8 C1,C2;
 	
 	//判断目标地址是否为本机
-	if(((buf[3]<<8)|buf[4]) == LocalAddress)
+	if(((buf[5]<<8)|buf[6]) == LocalAddress)
 	{
 		//CRC校验
 		CRC=CRC_CALC(buf,(len-2));  
@@ -222,19 +217,19 @@ void Dbus::Analyze(char *buf ,u8 len)
 		if(C1==buf[len-2]&&C2==buf[len-1])//校验正确
 		{		
 			//解析
-			if(buf[2]==1)//操作帧
+			if(buf[4]==1)//操作帧
 			{
-				switch(buf[5])//功能码
+				switch(buf[7])//功能码
 				{
-					case 0x01:RecFuc1(buf,len);break; //读单个寄存器
-					case 0x02:RecFuc2(buf,len);break; //写单个寄存器				      
-					case 0x03:RecFuc3(buf,len);break; //读多个寄存器
-					case 0x04:RecFuc4(buf,len);break; //写多个寄存器
-					default:					break;  	
+					case 0x01:Response_Read_Register(buf);break; //读单个寄存器
+					case 0x02:Response_Write_Register(buf);break; //写单个寄存器				      
+					case 0x03:Response_Read_Multiple_Registers(buf);break; //读多个寄存器
+					case 0x04:Response_Write_Multiple_Registers(buf);break; //写多个寄存器
+					default:break;  	
 				}	
 			}  
 			else 
-			if(buf[2]==2)//响应帧
+			if(buf[4]==2)//响应帧
 			{
 				//添加到响应帧缓冲池
 				for(int i=0;i<DBUS_MAX_RESPONSE_BUF;i++)
@@ -285,18 +280,132 @@ void Dbus::Heart(u16 TargetAddress)//心跳函数
 	char TX_BUF[7];
 	//存储CRC计算结果临时变量
 	u16 CRC;
-	TX_BUF[0] = LocalAddress >>8;//本机地址高
-	TX_BUF[1] = LocalAddress;//本机地址低
-	TX_BUF[2] = 0;//帧类型
-	TX_BUF[3] = 0;//目标地址高
-	TX_BUF[4] = 1;//目标地址低
+	FrameID++;
+	u16 frameid = FrameID;
 	
-	CRC=CRC_CALC(TX_BUF,5);
+	TX_BUF[0] = frameid>>8;//帧ID高
+	TX_BUF[1] = frameid;//帧ID低		
+	TX_BUF[2] = LocalAddress >>8;//本机地址高
+	TX_BUF[3] = LocalAddress;//本机地址低
+	TX_BUF[4] = 0;//帧类型
+	TX_BUF[5] = 0;//目标地址高
+	TX_BUF[6] = 1;//目标地址低
 	
-	TX_BUF[5] = CRC>>8;//CRC高
-	TX_BUF[6] = CRC;   //CRC低
+	CRC=CRC_CALC(TX_BUF,7);
 	
-	Send(TX_BUF,7);
+	TX_BUF[7] = CRC>>8;//CRC高
+	TX_BUF[8] = CRC;   //CRC低
+	
+	Send(TX_BUF,9);
+}
+
+//读单个寄存器
+ReturnMsg Dbus::Read_Register(u16 TargetAddress,u16 RegisterAddress)
+{
+	u16 CRC=0;	
+	char TX_BUF[12];
+	ReturnMsg msg;
+	FrameID++;
+	u16 frameid = FrameID;
+	
+	TX_BUF[0] = frameid>>8;//帧ID高
+	TX_BUF[1] = frameid;//帧ID低	
+	TX_BUF[2] = LocalAddress>>8;//本机地址高
+	TX_BUF[3] = LocalAddress;//本机地址低
+	TX_BUF[4] = 1;//帧类型
+	TX_BUF[5] = TargetAddress>>8;//目标地址高
+	TX_BUF[6] = TargetAddress;//目标地址低
+	TX_BUF[7] = 1;//功能码
+	TX_BUF[8] = RegisterAddress>>8;//寄存器地址高
+	TX_BUF[9] = RegisterAddress;//寄存器地址低
+
+	CRC=CRC_CALC(TX_BUF,10);
+	
+	TX_BUF[10] = CRC>>8;//CRC高
+	TX_BUF[11] = CRC;//CRC低	
+		
+	for(int j=0;j<DBUS_MAX_REPEAT_NUM; j++)
+	{
+		//发送数据
+		Send(TX_BUF,12);
+		//等待响应
+		for(int k=0;k<DBUS_TIMEOUT;k++)
+		{
+			for(int i=0;i<DBUS_MAX_RESPONSE_BUF ;i++)
+			{
+				if(DBUS_RESPONSE_BUF[i][0]!=0)
+				{
+					if(((DBUS_RESPONSE_BUF[i][1]<<8)|DBUS_RESPONSE_BUF[i][2]) == frameid)
+					{
+						msg.resault = 1;
+						msg.Data = DBUS_RESPONSE_BUF[i][10]<<8|DBUS_RESPONSE_BUF[i][11];
+						DBUS_RESPONSE_BUF[i][0]=0;
+						return msg;
+					}
+				}
+			}
+			//延时1ms，防止实时系统调用时卡死
+			DELAY_CALLBACK();
+		}
+	}
+	msg.resault = 0;
+	return msg;
+}
+//读多个寄存器
+ReturnMsg Dbus::Read_Multiple_Registers(u16 TargetAddress,u16 RegisterAddress,u8 Num)
+{
+	u16 CRC=0;	
+	char TX_BUF[13];
+	ReturnMsg msg;
+	FrameID++;
+	u16 frameid = FrameID;
+	
+	TX_BUF[0] = frameid>>8;//帧ID高
+	TX_BUF[1] = frameid;//帧ID低	
+	TX_BUF[2] = LocalAddress>>8;//本机地址高
+	TX_BUF[3] = LocalAddress;//本机地址低
+	TX_BUF[4] = 1;//帧类型
+	TX_BUF[5] = TargetAddress>>8;//目标地址高
+	TX_BUF[6] = TargetAddress;//目标地址低
+	TX_BUF[7] = 3;//功能码
+	TX_BUF[8] = RegisterAddress>>8;//寄存器地址高
+	TX_BUF[9] = RegisterAddress;//寄存器地址低
+	TX_BUF[10] = Num;//待读取寄存器数量
+
+	CRC=CRC_CALC(TX_BUF,11);
+	
+	TX_BUF[11] = CRC>>8;//CRC高
+	TX_BUF[12] = CRC;//CRC低	
+		
+	for(int j=0;j<DBUS_MAX_REPEAT_NUM; j++)
+	{
+		//发送数据
+		Send(TX_BUF,13);
+		//等待响应
+		for(int k=0;k<DBUS_TIMEOUT;k++)
+		{
+			for(int i=0;i<DBUS_MAX_RESPONSE_BUF ;i++)
+			{
+				if(DBUS_RESPONSE_BUF[i][0]!=0)
+				{
+					if(((DBUS_RESPONSE_BUF[i][1]<<8)|DBUS_RESPONSE_BUF[i][2]) == frameid)
+					{
+						msg.resault = 1;
+						for(int t=0;t<Num;t++)
+						{
+							msg.DataBuf[t] = DBUS_RESPONSE_BUF[i][11+2*t]<<8|DBUS_RESPONSE_BUF[i][12+2*t];
+						}
+						DBUS_RESPONSE_BUF[i][0]=0;
+						return msg;
+					}
+				}
+			}
+			//延时1ms，防止实时系统调用时卡死
+			DELAY_CALLBACK();
+		}
+	}
+	msg.resault = 0;
+	return msg;
 }
 /*写单个寄存器
  *@Function        给单个寄存器写值
@@ -435,162 +544,174 @@ u8 Dbus:: Write_Multiple_Registers(u16 TargetAdress,u16 RegisterAddress,u8 Num,u
 
 
 
-
-
-
-
-/*读单个寄存器*/ 
-void RecFuc1(char *buf ,u8 len)
- {
-
- }   
-
-/*写单个寄存器*/ 
-void RecFuc2(char *buf ,u8 len)
- {
-//	 u16 startadd;//待写入寄存器地址
-//	 u16 data;//待写入数据
-//	 
-//	 startadd = (Dbus_Recive[6]<<8)|Dbus_Recive[7];
-//	 data = (Dbus_Recive[8]<<8)|Dbus_Recive[9];
-//	 //更新数据
-//	 Dbus_Data[startadd] = data;
-//	 	 
-//	 //回复响应帧
-//	 responsedata((Dbus_Recive[0]<<8)|Dbus_Recive[1],Dbus_Recive[5],1);
- } 
+/*响应读单个寄存器*/ 
+void Dbus::Response_Read_Register(char *buf)
+{
+	u16 CRC=0;	
+	char TX_BUF[14];
+	//待读取寄存器地址
+	u16 regAdd = buf[8]<<8|buf[9];
 	
+	TX_BUF[0] = buf[0];//帧ID高
+	TX_BUF[1] = buf[1];//帧ID低	
+	TX_BUF[2] = LocalAddress>>8;//本机地址高
+	TX_BUF[3] = LocalAddress;//本机地址低
+	TX_BUF[4] = 2;//帧类型
+	TX_BUF[5] = buf[5];//目标地址高
+	TX_BUF[6] = buf[6];//目标地址低
+	TX_BUF[7] = 1;//功能码
+	TX_BUF[8] = buf[8];//寄存器地址高
+	TX_BUF[9] = buf[9];//寄存器地址低
+	
+	//如果请求地址超出限制，返回数据为0xFFFF
+	if(regAdd>DBUS_REGISTER_LENGTH)
+	{
+		TX_BUF[10] = 0xFF;//数据高
+		TX_BUF[11] = 0xFF;//数据低
+	}
+	else
+	{
+		TX_BUF[10] = Dbus_Register[regAdd]>>8;//数据高
+		TX_BUF[11] = Dbus_Register[regAdd];//数据低
+	}
+	CRC=CRC_CALC(TX_BUF,12);
+	TX_BUF[12] = CRC>>8;//CRC高
+	TX_BUF[13] = CRC;//CRC低	
+	
+	//发送数据
+	Send(TX_BUF,14);		
+}   
 
-
-/*读多个寄存器*/ 
-void RecFuc3(char *buf ,u8 len)
+/*响应写单个寄存器*/ 
+void Dbus:: Response_Write_Register(char *buf)
  {
-
- }
+	u16 CRC=0;	
+	char TX_BUF[11];
+	//待写入寄存器地址
+	u16 regAdd = buf[8]<<8|buf[9];
+	//待写入数据
+	u16 data = (buf[10]<<8)|buf[11];
+	 	 
+	//回复响应帧
+	TX_BUF[0] = buf[0];//帧ID高
+	TX_BUF[1] = buf[1];//帧ID低	
+	TX_BUF[2] = LocalAddress>>8;//本机地址高
+	TX_BUF[3] = LocalAddress;//本机地址低
+	TX_BUF[4] = 2;//帧类型
+	TX_BUF[5] = buf[5];//目标地址高
+	TX_BUF[6] = buf[6];//目标地址低
+	TX_BUF[7] = 2;//功能码
+	
+	if(regAdd>DBUS_REGISTER_LENGTH)
+	{
+		TX_BUF[8] = 0;//结果	
+	}
+	else
+	{
+		TX_BUF[8] = 1;//结果	
+		//更新数据
+		Dbus::Dbus_Register[regAdd] = data;
+	}
+		
+	CRC=CRC_CALC(TX_BUF,9);
+	
+	TX_BUF[9] = CRC>>8;//CRC高
+	TX_BUF[10] = CRC;//CRC低	
+	
+	//发送数据
+	Send(TX_BUF,11);	
+} 
  
-/*写多个寄存器*/ 
-void RecFuc4(char *buf ,u8 len)
+/*响应读多个寄存器*/ 
+void Dbus:: Response_Read_Multiple_Registers(char *buf)
+{
+	u16 CRC=0;	
+	u8 Num = buf[10];
+	char *TX_BUF=(char *)malloc((11+2*Num+2)*sizeof(char));//定义动态数组TX_BUF[11+2*Num+2];
+	//待读取寄存器起始地址
+	u16 regStartAdd = buf[8]<<8|buf[9];
+	
+	TX_BUF[0] = buf[0];//帧ID高
+	TX_BUF[1] = buf[1];//帧ID低	
+	TX_BUF[2] = LocalAddress>>8;//本机地址高
+	TX_BUF[3] = LocalAddress;//本机地址低
+	TX_BUF[4] = 2;//帧类型
+	TX_BUF[5] = buf[5];//目标地址高
+	TX_BUF[6] = buf[6];//目标地址低
+	TX_BUF[7] = 3;//功能码
+	TX_BUF[8] = buf[8];//寄存器起始地址高
+	TX_BUF[9] = buf[9];//寄存器起始地址低
+	TX_BUF[10] = buf[10];//数量
+	
+	for(int i=0;i<Num;i++)
+	{
+		//如果请求地址超出限制，返回数据为0xFFFF
+		if((regStartAdd+i)>DBUS_REGISTER_LENGTH)
+		{
+			TX_BUF[11+i*2] = 0xFF;//数据高
+			TX_BUF[12+i*2] = 0xFF;//数据低
+		}
+		else
+		{
+			TX_BUF[11+i*2] = Dbus::Dbus_Register[regStartAdd+i]>>8;//数据高
+			TX_BUF[12+i*2] = Dbus::Dbus_Register[regStartAdd+i];//数据低
+		}
+	}
+
+	CRC=CRC_CALC(TX_BUF,11+Num*2);
+	
+	TX_BUF[11+Num*2] = CRC>>8;//CRC高
+	TX_BUF[11+Num*2+1] = CRC;//CRC低	
+	
+	//发送数据
+	Send(TX_BUF,11+Num*2+2);
+	
+	//释放动态开辟的空间
+	free(TX_BUF);
+	/*为了防止野指针产生*/
+  TX_BUF = NULL;	
+}
+ 
+/*响应写多个寄存器*/ 
+void Dbus:: Response_Write_Multiple_Registers(char *buf)
  {
-//	 u16 startadd;//待写入寄存器地址
-//	 u16 len;//待写入数据长度
-//	 u16 i;
-//	 startadd = (Dbus_Recive[6]<<8)|Dbus_Recive[7];
-//	 len = Dbus_Recive[8];
-//	 for(i=0;i<len;i++)
-//	 {
-//		  Dbus_Data[startadd+i] = (Dbus_Recive[9+2*i]<<8)|Dbus_Recive[10+2*i];
-//	 }
-//	 
-//	 //回复响应帧
-//	 responsedata((Dbus_Recive[0]<<8)|Dbus_Recive[1],Dbus_Recive[5],1);
+	u16 CRC=0;	
+	char TX_BUF[11];
+	//待写入寄存器起始地址
+	u16 regStartAdd = buf[8]<<8|buf[9];
+	u8 Num = buf[10];
+	//回复响应帧
+	TX_BUF[0] = buf[0];//帧ID高
+	TX_BUF[1] = buf[1];//帧ID低	
+	TX_BUF[2] = LocalAddress>>8;//本机地址高
+	TX_BUF[3] = LocalAddress;//本机地址低
+	TX_BUF[4] = 2;//帧类型
+	TX_BUF[5] = buf[5];//目标地址高
+	TX_BUF[6] = buf[6];//目标地址低
+	TX_BUF[7] = 4;//功能码
+	TX_BUF[8] = 1;//结果
+	for(int i=0;i<Num;i++) 
+	{
+		if((regStartAdd+i)>DBUS_REGISTER_LENGTH)
+		{
+			TX_BUF[8] = 0;//结果	
+		}
+		else
+		{
+			TX_BUF[8] = 1;//结果	
+			//更新数据
+			Dbus::Dbus_Register[regStartAdd+i] = buf[11]<<8|buf[12];
+		}
+	}
+
+	CRC=CRC_CALC(TX_BUF,9);
+	
+	TX_BUF[9] = CRC>>8;//CRC高
+	TX_BUF[10] = CRC;//CRC低	
+	
+	//发送数据
+	Send(TX_BUF,11);		 
  }  
-
-
-///// <summary>
-///// 响应帧
-///// </summary>
-///// <param name="DstAdress">目标地址</param>
-///// <param name="func">功能码</param>
-///// <param name="Data">结果</param>
-//void responsedata(u16 DstAdress,u8 func,u8 resault)
-//{
-////	u16 crctemp=0;
-////	Dbus_TX_BUF[0] = DbusLocalAddress>>8;//本机地址高
-////	Dbus_TX_BUF[1] = DbusLocalAddress;//本机地址低
-////	Dbus_TX_BUF[2] = 2;//帧类型
-////	Dbus_TX_BUF[3] = DstAdress>>8;//目标地址高
-////	Dbus_TX_BUF[4] = DstAdress;//目标地址低
-////	Dbus_TX_BUF[5] = func;//功能码
-////	Dbus_TX_BUF[6] = resault;//结果
-////	 
-////	crctemp=dbus_CalcCrc(Dbus_TX_BUF,7);
-////	
-////	Dbus_TX_BUF[7] = crctemp>>8;//CRC高
-////	Dbus_TX_BUF[8] = crctemp;//CRC低
-////	
-////	uart.printf_length(Dbus_TX_BUF,9);
-//}
-
-
-////src:指令
-////dst:返回信息
-////timeout:超时时间
-//int check(char* dst,u16 timeout,char* src,...)
-//{
-////	u16 num=0;
-////	char *resault;
-////	
-////	u16 i;
-////	va_list ap;
-////	va_start(ap,src);
-////	vsprintf((char*)Dbus_TX_BUF,src,ap);
-////	va_end(ap);
-////	i=strlen((const char*)Dbus_TX_BUF);//此次发送数据的长度
-
-////    uart.printf_length(Dbus_TX_BUF,i);
-////	while(!resault&&num<(timeout/10.0))
-////	{
-////		resault=strstr(Dbus_Recive,dst);
-////		delay_ms(10);
-////		num++;
-////	}
-////	clear_rxBuf2();
-////	if(resault)
-////	{
-////		return 1;
-////	}
-////	else
-//		return 0;
-//}
-
-////比较字符串和目标地址
-//u16 ComperStr(u16 RegisterAdress,char* str)
-//{
-//	u16 len,i;
-//	len = strlen(str);//数据长度
-//	for(i=0;i<len;i++)
-//	{
-//		if(Dbus_Data[RegisterAdress+i/2]>>8 != str[i])
-//		{
-//			return 0;
-//		}
-//		if(i<(len-1))
-//		{
-//			if((Dbus_Data[RegisterAdress+i/2]&0xff) != str[i+1])
-//			{
-//				return 0;
-//			}
-//		}
-//		i++;
-//	}
-//	return 1;
-//}
-
-////写字符串到目标地址
-//u16 WriteStr(u16 DstAdress,u16 RegisterAdress,char* str)
-//{
-//	u16 len,i,len2=0;
-//	u16 data[100];
-//	len = strlen(str);//数据长度
-//	
-//	for(i=0;i<len;i++)
-//	{
-//		data[len2] = str[i]<<8;
-//		if(i<(len-1))
-//		{
-//			data[len2] |= str[i+1];
-//		}
-//		i++;
-//		len2++;
-//	}
-//	return Write_MultipleWord(DstAdress,RegisterAdress,len2,data);
-//}
-
-
-
-
-
-
 
 
 

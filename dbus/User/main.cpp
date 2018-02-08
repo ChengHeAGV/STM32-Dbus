@@ -88,9 +88,7 @@ int main(void)
 	dbus.OutPut_interrupt(dbus_test);
 	dbus.Delay_interrupt(dbus_delay);
 	dbus.InPut('a');
-	
 	//OpenBox();
-	
 	setup();
 	while (1)
 	{
