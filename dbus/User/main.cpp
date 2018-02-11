@@ -15,8 +15,7 @@
 #include "ebox.h"
 #include "dbus.h"
 #include "led.h"
-
-
+#include "ebox_common.h"
 //数据接收缓冲池--字符串数组
 //char uart2_Recive[]="03$0356342382!$014caabbcc!$043467895d!$0";
 
@@ -54,6 +53,8 @@ void setup()
 	uart2.begin(115200);
 	uart2.attach_rx_interrupt(test);
 	uart2.attach_tx_interrupt(test1);
+	
+//	uart6.begin(115200);
 }
 //LED 闪烁参数
 u16 OnTime = 300;
@@ -84,27 +85,36 @@ int main(void)
 {
 	u16 i = 0;
 	Dbus dbus(1);
-	dbus.Write_Register(1,1,1);
-	dbus.OutPut_interrupt(dbus_test);
-	dbus.Delay_interrupt(dbus_delay);
-	dbus.InPut('a');
+//	dbus.Write_Register(1,1,1);
+//	dbus.OutPut_interrupt(dbus_test);
+//	dbus.Delay_interrupt(dbus_delay);
+//	dbus.InPut('a');
 	//OpenBox();
 	setup();
+	delay_ms(800);
+
+//	uart6.printf("AT+CIPSTART=\"UDP\",\"192.168.31.18\",8080,9000,0\r\n");
+//	delay_ms(800);
+//	uart6.printf("AT+CIPMODE=1\r\n");
+//	delay_ms(800);
+//	uart6.printf("AT+CIPSEND\r\n");
+//	delay_ms(800);
+//	uart6.printf("connect!");
 	while (1)
-	{
+	{led();delay_ms(800);
 		//uart2.printf("uart is ok ! count = %d\r\n", count);
-		dbus.Heart(1);
-		led();
-		delay_ms(10);
-		//		Heart();
-		led();
-		//delay_ms(100);
-		for (i = 0; i < 100; i++)
-		{
-			dbus.Write_Register(4, i, random(0xff));
-			led();
-			//delay_ms(10);
-		}
+//		dbus.Heart(1);
+//		led();
+//		delay_ms(10);
+//		//		Heart();
+//		led();
+//		//delay_ms(100);
+//		for (i = 0; i < 100; i++)
+//		{
+//			dbus.Write_Register(4, i, random(0xff));
+//			led();
+//			//delay_ms(10);
+//		}
 	}
 }
 
