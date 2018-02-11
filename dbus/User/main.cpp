@@ -13,12 +13,13 @@
 
 
 #include "ebox.h"
-#include "dbus.h"
+//#include "dbus.h"
 #include "led.h"
-#include "ebox_common.h"
 //数据接收缓冲池--字符串数组
 //char uart2_Recive[]="03$0356342382!$014caabbcc!$043467895d!$0";
 
+//Dbus dbus(1);
+Usart uart6(USART6,&PC6,&PC7);
 
 //串口接收
 void test()
@@ -50,11 +51,12 @@ void setup()
 	PE1.set();
 
 	//串口初始化
-	uart2.begin(115200);
-	uart2.attach_rx_interrupt(test);
-	uart2.attach_tx_interrupt(test1);
+//	uart2.begin(115200);
+//	uart2.attach_rx_interrupt(test);
+//	uart2.attach_tx_interrupt(test1);
 	
-//	uart6.begin(115200);
+	uart6.begin(115200);
+
 }
 //LED 闪烁参数
 u16 OnTime = 300;
@@ -84,16 +86,15 @@ void dbus_delay()
 int main(void)
 {
 	u16 i = 0;
-	Dbus dbus(1);
 //	dbus.Write_Register(1,1,1);
 //	dbus.OutPut_interrupt(dbus_test);
 //	dbus.Delay_interrupt(dbus_delay);
 //	dbus.InPut('a');
 	//OpenBox();
 	setup();
+	
 	delay_ms(800);
-
-//	uart6.printf("AT+CIPSTART=\"UDP\",\"192.168.31.18\",8080,9000,0\r\n");
+	//uart6.printf("AT+CIPSTART=\"UDP\",\"192.168.31.18\",8080,9000,0\r\n");
 //	delay_ms(800);
 //	uart6.printf("AT+CIPMODE=1\r\n");
 //	delay_ms(800);
@@ -101,8 +102,11 @@ int main(void)
 //	delay_ms(800);
 //	uart6.printf("connect!");
 	while (1)
-	{led();delay_ms(800);
-		//uart2.printf("uart is ok ! count = %d\r\n", count);
+	{
+		//uart6.put_string("asdfsaf");
+	//	led();
+		delay_ms(200);
+		uart6.printf("uart is ok ! \r\n");
 //		dbus.Heart(1);
 //		led();
 //		delay_ms(10);

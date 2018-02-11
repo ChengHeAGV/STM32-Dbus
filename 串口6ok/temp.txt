@@ -1,0 +1,71 @@
+
+
+
+
+
+
+
+
+
+
+void task2_task(void *p_arg)
+{
+		char *p;
+	u8 dst[4]={0,0,0,0};
+  char *l="#$";      
+  u16 i=0;  
+   u8 aa=0; 
+	 u8 bb=0; 
+	OS_ERR err;
+		while(1)
+	{	//u3_printf(USART3_RX_BUF);
+//		OUT1=~OUT1;
+		//u3_printf("Hellow STM32F407ZGT6\r\n");
+		//u3_printf("泰赛科技！\r\n");
+		//USART3_Puts("1");
+		OSTimeDlyHMSM(0,0,0,10,OS_OPT_TIME_HMSM_STRICT,&err); //延时1s
+		LED0=~LED0;
+		OSTimeDlyHMSM(0,0,0,10,OS_OPT_TIME_HMSM_STRICT,&err); //延时1s
+		LED1=~LED1;
+		OSTimeDlyHMSM(0,0,0,10,OS_OPT_TIME_HMSM_STRICT,&err); //延时1s
+		LED2=~LED2;
+		OSTimeDlyHMSM(0,0,0,10,OS_OPT_TIME_HMSM_STRICT,&err); //延时1s
+		LED3=~LED3;
+		if(aa==0)aa=1;
+		else
+			aa=0;
+		PLC_InPut[0]=aa;
+		OSTimeDlyHMSM(0,0,0,500,OS_OPT_TIME_HMSM_STRICT,&err); //延时1s
+			if(bb==0)bb=1;
+		else
+			bb=0;
+		PLC_InPut[1]=bb;
+		OSTimeDlyHMSM(0,0,0,500,OS_OPT_TIME_HMSM_STRICT,&err); //延时1s
+	//	printf("hello world");
+		
+		    //u2_printf("gjhkjh");
+		    p=strstr(USART3_RX_BUF,l);
+        if(p)
+				{
+					u3_printf("%s",p);
+					u3_printf("\r\n");
+					u3_printf("%s",USART3_RX_BUF);
+					u3_printf("\r\n");
+					dst[0]=p[17];
+					dst[1]=p[18];
+					dst[2]=p[19];
+					//movmem(dst,&USART3_RX_BUF[17],4);
+					u3_printf(dst);
+					u3_printf("\r\n");
+					//u3_printf("%-3s",&USART3_RX_BUF[17]);
+					
+					//bzero(USART3_RX_BUF,RxCounter3-1);	
+					for(i=0;;i++)
+					USART3_RX_BUF[i]=0;
+					RxCounter3=0;
+				}
+//        else
+//          u3_printf("Not Found!\r\n");
+
+	}
+}

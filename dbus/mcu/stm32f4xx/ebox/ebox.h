@@ -27,7 +27,6 @@ extern Usart uart1;
 //Usart uart1(USART1,&PB6,&PB7);
 extern Usart uart2;
 extern Usart uart3;
-extern Usart uart6;
 
 
 extern Spi spi1;

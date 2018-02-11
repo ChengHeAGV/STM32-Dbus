@@ -21,7 +21,6 @@ Usart uart1(USART1,&PA9,&PA10);
 Usart uart2(USART2,&PA2,&PA3);
 //Usart uart2(USART2,&PD5,&PD6);
 Usart uart3(USART3,&PB10,&PB11);
-Usart uart6(USART6,&PC6,&PC7);
 
 Gpio PA0(GPIOA, GPIO_Pin_0);
 Gpio PA1(GPIOA, GPIO_Pin_1);

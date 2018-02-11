@@ -2,10 +2,10 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include "string.h"
-callback_fun_type usart_callback_table[5][2];//支持串口的rx中断
+callback_fun_type usart_callback_table[6][2];//支持串口的rx中断
 #define uart_tx_length   100
 uint8_t uart_tx_buf[uart_tx_length];
-uint8_t uart_busy[5];
+uint8_t uart_busy[6];
 /**
  *@name     USART::USART(USART_TypeDef *USARTx,GPIO *tx_pin,GPIO *rx_pin)
  *@brief    串口的构造函数
@@ -22,7 +22,7 @@ Usart::Usart(USART_TypeDef *USARTx, Gpio *tx, Gpio *rx)
 }
 void Usart::begin(uint32_t baud_rate)
 {
-    begin(baud_rate,1);
+    begin(baud_rate,0);
 }
 void Usart::begin(uint32_t baud_rate,uint8_t use_dma)
 {
@@ -130,7 +130,26 @@ void Usart::begin(uint32_t baud_rate,uint8_t use_dma)
             dma_irq             = DMA1_Stream7_IRQn;
             dma_stream          = DMA1_Stream7;
         break;   
-    
+		 case (uint32_t)USART6_BASE:
+			/* gpio parament
+			*/
+			gpio_af_usart       = GPIO_AF_USART6;
+		
+			/* usart parament
+			*/
+			rcc_usart_clock_cmd = RCC_APB1PeriphClockCmd;
+			usart_rcc           = RCC_APB2Periph_USART6;
+			usart_irq           = USART6_IRQn;
+			/* dma parament
+			*/
+			rcc_dma_clock_cmd   = RCC_AHB1PeriphClockCmd;        
+			dma_rcc             = RCC_AHB1Periph_DMA2;
+			dma                 = DMA2;
+			dma_channel         = DMA_Channel_5;
+			dma_irq             = DMA1_Stream7_IRQn;
+			dma_stream          = DMA1_Stream7;
+		break;   
+   
     }               
     usart_config(baud_rate);
     if(this->use_dma == 1)
@@ -253,6 +272,9 @@ void Usart::attach_rx_interrupt(void (*callback_fun)(void))
     case (uint32_t)UART5_BASE:
         usart_callback_table[4][0] = callback_fun;
         break;
+    case (uint32_t)USART6_BASE:
+        usart_callback_table[5][0] = callback_fun;
+        break;
     }
 }
 
@@ -280,6 +302,9 @@ void Usart::attach_tx_interrupt(void (*callback_fun)(void))
         break;
     case (uint32_t)UART5_BASE:
         usart_callback_table[4][1] = callback_fun;
+        break;
+    case (uint32_t)USART6_BASE:
+        usart_callback_table[5][1] = callback_fun;
         break;
     }
 }
@@ -337,7 +362,7 @@ void Usart::put_string(const char *str, uint16_t length)
     {
         while(length--)
         {
-            while(USART_GetFlagStatus(USARTx, USART_FLAG_TXE) == RESET);//单字节等待，等待寄存器空
+//            while(USART_GetFlagStatus(USARTx, USART_FLAG_TXE) == RESET);//单字节等待，等待寄存器空
             USART_SendData(USARTx, *str++);
         }
     }
@@ -444,6 +469,9 @@ void Usart::wait_busy()
     case (uint32_t)UART5_BASE:
         while(uart_busy[4] == 1);
         break;
+    case (uint32_t)USART6_BASE:
+        while(uart_busy[5] == 1);
+        break;
     }
 }
 
@@ -472,6 +500,9 @@ void Usart::set_busy()
         break;
     case (uint32_t)UART5_BASE:
         uart_busy[4] = 1;
+        break;
+    case (uint32_t)USART6_BASE:
+        uart_busy[5] = 1;
         break;
     }
 }
@@ -556,6 +587,23 @@ extern "C" {
             if(usart_callback_table[4][1] != 0)
                 usart_callback_table[4][1]();
             USART_ClearITPendingBit(UART5, USART_IT_TC);
+        }
+    }
+	
+	void USART6_IRQHandler(void)
+    {
+        if(USART_GetITStatus(USART6, USART_IT_RXNE) == SET)
+        {
+            if(usart_callback_table[5][0] != 0)
+                usart_callback_table[5][0]();
+            USART_ClearITPendingBit(USART6, USART_IT_RXNE);
+        }
+        if(USART_GetITStatus(USART6, USART_IT_TC) == SET)
+        {
+            uart_busy[5] = 0;
+            if(usart_callback_table[5][1] != 0)
+                usart_callback_table[5][1]();
+            USART_ClearITPendingBit(USART6, USART_IT_TC);
         }
     }
 }
