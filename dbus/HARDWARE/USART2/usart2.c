@@ -98,7 +98,6 @@ void u2_printf(char* fmt,...)
 	}
 	
 }
- 
 
 void USART_OUT(USART_TypeDef* USARTx, char *Data,uint8_t len)
 { 

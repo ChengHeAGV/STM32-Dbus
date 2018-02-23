@@ -277,7 +277,7 @@ int check(char* dst,u16 timeout,char* src,...)
 		num++;
 	}
 	memset(USART6_RX_BUF,0,USART6_MAX_RECV_LEN);
-	RxCounter6 = 0;
+	//RxCounter6 = 0;
 	if(resault)
 	{
 		return 1;
@@ -289,7 +289,7 @@ int check(char* dst,u16 timeout,char* src,...)
 
 char* AP="geekiot";
 char* PASSWORD="8008208820";
-char* HOST_IP="192.168.155.3";
+char* HOST_IP="192.168.23.3";
 char* HOST_PORT="18666";
 //task1任务函数
 void task1_task(void *p_arg)
@@ -302,26 +302,35 @@ void task1_task(void *p_arg)
 		LED0 = 1;
 	}
 }
-
+u8 WIFI_BUSY = 0;
 void WIFI_Send(char *str,u16 len)
 {
+    while(WIFI_BUSY)
+    {
+        delay_ms(10);
+    }
+    WIFI_BUSY = 1;
 	USART_OUT(USART6,str,len);
+    WIFI_BUSY = 0;
 }
-
+void delay()
+{
+    delay_ms(1);
+}
 //task2任务函数
 void task2_task(void *p_arg)
 {
 	/////////////配置wifi//////////////////
 	//等待8266复位
-//	delay_ms(1000);//ms<1840
-//	delay_ms(1000);//ms<1840
+	delay_ms(1000);//ms<1840
+	delay_ms(1000);//ms<1840
 	u6_printf(" ");
 	//AT模式
 	//if(check("OK",500,"AT\r\n"))
 	//{
-		//check("OK",1000,"AT+CWMODE=1\r\n");//配置为STATION模式 no change
-		
-		//check("OK",10000,"AT+CWJAP=\"%s\",\"%s\"\r\n",AP,PASSWORD);//加入AP
+//		check("OK",1000,"AT+CWMODE=1\r\n");//配置为STATION模式 no change
+//		
+//		check("OK",15000,"AT+CWJAP=\"%s\",\"%s\"\r\n",AP,PASSWORD);//加入AP
 		
 		check("OK",1000,"AT+CIPSTART=\"UDP\",\"%s\",%s\r\n",HOST_IP,HOST_PORT);//配置UDP ALREAY CONNECT
 		
@@ -332,13 +341,14 @@ void task2_task(void *p_arg)
 	////////////////////////////////////////
 	//初始化DBUS
 	Dbus_Init(2);
-//	LocalAddress = 2;
 	OutPut_interrupt(WIFI_Send);	
-	
+	Delay_interrupt(delay);
 	while(1)
 	{
-		Heart(1);
+        Heart(1);
 		delay_ms(1000);
+        delay_ms(1000);
+        delay_ms(1000);
 	}
 }
 
@@ -354,8 +364,16 @@ void task3_task(void *p_arg)
 //task4任务函数
 void task4_task(void *p_arg)
 {
+
+
 	while(1)
 	{
+    
+        //收到结束符触发解包函 
+        if (DBUS_RECIVE_BUF[DBUS_RECIVE_LEN - 1] == DBUS_END)
+        {
+            OpenBox();
+        }
 		delay_ms(10);
 	}
 }

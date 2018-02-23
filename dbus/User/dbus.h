@@ -19,7 +19,7 @@
 	#ifndef __DBUS_H
 	#define	__DBUS_H
 		
-	#define u8 char
+	#define u8  unsigned char
 	#define u16 unsigned short
 
 
@@ -43,14 +43,19 @@
 		u16 Data;
 		u16* DataBuf;
 	};
-	
+	//数据接收缓冲池
+    extern char DBUS_RECIVE_BUF[DBUS_MAX_RECIVE_BUF];
+    //接收缓冲池中数据长度（当前长度）
+    extern u16 DBUS_RECIVE_LEN;
+    //帧尾
+    extern char DBUS_END;
 	//初始化
 	extern void Dbus_Init(u16 Address);
 	extern void Heart(u16 TargetAddress);
 	//输入数据
 	extern void InPut(char c);
 	//解包函数
-	extern void OpenBox();
+	extern void OpenBox(void);
 	//解析函数
 	extern void Analyze(char *buf ,u8 len);
 	//输出数据中断

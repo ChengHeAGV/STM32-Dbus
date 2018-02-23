@@ -4,7 +4,6 @@
 #include "stdio.h"
 #include "stdlib.h"
 
-
 //本机地址
 u16 LocalAddress;
 //寄存器
@@ -58,11 +57,10 @@ u16 CRC_CALC(char *chData,unsigned short uNo)
 }
 
 /*********发送函数******************************************************************/
-void Send(char* buf,u8 len)
+void Send(u8* buf,u8 len)
 {
 	//数据发送临时数组
-	char TX_BUF[DBUS_MAX_LENGTH];
-	unsigned int TEMP[DBUS_MAX_LENGTH];
+	u8 TX_BUF[DBUS_MAX_LENGTH];
 	u8 hight=0;
 	u8 low=0;
 	
@@ -104,16 +102,39 @@ void Send(char* buf,u8 len)
 }
 
 /*********将16进制字符串转数值******************************************************************/
-void HexStrToDec(char* str,char* dec)
+void HexStrToDec(char* str,u8* dec)
 {
-	char temp[2];
 	u8 l;
-	l=strlen(str);
+    u8 hight=0;
+	u8 low=0  ;
+    l=strlen(str);
+    
 	for(int i=0;i<l ;i++)
-	{
-		temp[0]=str[i+0];
-		temp[1]=str[i+1];
-		sscanf(temp,"%x",&dec[i/2]);
+	{   
+        hight = str[i+0];//取高位
+	    low   = str[i+1];//取低位
+		
+		if((hight>=0x30)&&(hight<=0x39))  
+		{  
+			hight -= 0x30;  
+		} 
+        else
+        if((hight>=0x41)&&(hight<=0x46))//Capital  
+		{  
+			hight -= 0x37;  
+		}  
+        
+        if((low>=0x30)&&(low<=0x39))  
+		{  
+			low -= 0x30;  
+		} 
+        else
+        if((low>=0x41)&&(low<=0x46))//Capital  
+		{  
+			low -= 0x37;  
+		}  
+        
+		dec[i/2] = hight*0x10+low;
 		i++;
 	}
 }
@@ -131,94 +152,81 @@ void InPut(char c)
 {
 	//将收到的数据追加到接收缓存
 	DBUS_RECIVE_BUF[DBUS_RECIVE_LEN++] = c;
-	//收到结束符触发解包函数
-	if (DBUS_RECIVE_BUF[DBUS_RECIVE_LEN - 1] == DBUS_END)
-	{
-		OpenBox();
-	}
 }
 
 
 /*********解包函数******************************************************************/
 void OpenBox()
 {
-	char* p;
-	//向前移动的长度
-	u8 MOVE_LEN=0;
 	//单帧临时数组
 	char temp[DBUS_MAX_LENGTH];
 	//单帧转换后的数组
 	char buf[DBUS_MAX_LENGTH];
 	
-	//初步排除无效数据(如果第一个开始符前有数据，则清除)
-	p = strchr(DBUS_RECIVE_BUF,DBUS_HEAD);
-	if (p)
+    //接收双缓冲
+    char DBUS_RECIVE_DOUBLE_BUF[DBUS_MAX_RECIVE_BUF];
+    //接收双双缓冲长度
+    u16 DBUS_RECIVE_DOUBLE_LEN = DBUS_RECIVE_LEN;
+    
+    //复制缓冲区数据到双缓冲
+    memcpy(DBUS_RECIVE_DOUBLE_BUF,DBUS_RECIVE_BUF,DBUS_RECIVE_LEN);
+    //复位接收缓冲区
+    memset(DBUS_RECIVE_BUF,0,DBUS_MAX_RECIVE_BUF);
+    //清空接收缓冲长度
+    DBUS_RECIVE_LEN = 0;
+    
+    //开始标志
+    u16 Start = 0;
+    //结束标志
+    u16 Stop = 0;
+    //搜索结果
+    u8 reault = 0;
+    
+    //循环搜索并解析有效数据
+	while (DBUS_RECIVE_DOUBLE_LEN>(Stop+1))
 	{
-		//用MOVE_LEN记住移动前的数量
-		MOVE_LEN = DBUS_RECIVE_LEN;
-		//更新接收数量
-		DBUS_RECIVE_LEN -= p - DBUS_RECIVE_BUF;
-		//移动的数量
-		MOVE_LEN=MOVE_LEN-DBUS_RECIVE_LEN;
-		//移动有效数据
-		for (int i = 0; i < DBUS_RECIVE_LEN; i++)
+        reault = 0;
+		for(u16 i = Stop;i<DBUS_RECIVE_DOUBLE_LEN;i++)
 		{
-			DBUS_RECIVE_BUF[i] = DBUS_RECIVE_BUF[i + p - DBUS_RECIVE_BUF];
-		}
-		//清除剩余数据
-		for (int i = 0; i < MOVE_LEN; i++)
-		{
-			DBUS_RECIVE_BUF[i+DBUS_RECIVE_LEN] = 0;
-		}
-	}
-	
-	//循环搜索并解析有效数据
-	while (DBUS_RECIVE_LEN > 0)
-	{
-		if (1 == sscanf(DBUS_RECIVE_BUF,DBUS_REGEX,temp))//
-		{
-			//由于上面条件的正则不判断是否有截止符，因此需满足以下条件(包含结束符)
-			p = strchr(DBUS_RECIVE_BUF, DBUS_END);
-			if(p)
+			//查找开始符
+			if(DBUS_RECIVE_DOUBLE_BUF[i] == DBUS_HEAD)
 			{
-				//将分包的十六进制字符串temp转换为数值数组buf
-				HexStrToDec(temp,buf);
-				//执行解析函数
-				Analyze(buf,(p - DBUS_RECIVE_BUF-1)/2);//指针之差是字符串长度，应该除2
-				
-				/**清除第一个结束符之前的数据（已经使用过及之前的无效数据）**/
-				
-				//用MOVE_LEN记住移动前的数量
-				MOVE_LEN=DBUS_RECIVE_LEN;
-				//更新接收数量
-				DBUS_RECIVE_LEN -= p - DBUS_RECIVE_BUF + 1;
-				//移动的数量
-				MOVE_LEN=MOVE_LEN-DBUS_RECIVE_LEN;
-				if (DBUS_RECIVE_LEN > 0)
-				{
-					//移动有效数据
-					for (int i = 0; i < DBUS_RECIVE_LEN; i++)
-					{
-						DBUS_RECIVE_BUF[i] = DBUS_RECIVE_BUF[i + p - DBUS_RECIVE_BUF + 1];
-					}
-					//清除剩余数据
-					for (int i = 0; i < MOVE_LEN; i++)
-					{
-						DBUS_RECIVE_BUF[i+DBUS_RECIVE_LEN] = 0;
-					}
-				}
-				else
-				{
-					//避免出现负数
-					DBUS_RECIVE_LEN=0;
-				}
+				Start = i;
 			}
-			else
+			//查找结束符
+			if((Start>=Stop)&&DBUS_RECIVE_DOUBLE_BUF[i] == DBUS_END)
 			{
-				break;
+				Stop = i;
+                reault = 1;
+                break;
 			}
 		}
+        if(reault == 1)//找到了有效的数据
+        {
+            //如果头尾中间没有数据，不处理
+            if((Stop-Start)==1)
+            {
+                continue;
+            }
+            else
+            {
+                //将获取到的数据拷贝到临时数组
+                memcpy(temp,&DBUS_RECIVE_DOUBLE_BUF[Start+1],Stop-Start+1-2);
+                //将分包的十六进制字符串temp转换为数值数组buf
+                HexStrToDec(temp,buf);
+                //执行解析函数
+                Analyze(buf,(Stop-Start+1-2)/2);//指针之差是字符串长度，应该除2
+            }
+            
+        }
+		else//没有找到有效数据
+        {
+            //退出循环
+            break;
+        }
 	}
+    //复位接收缓冲区
+    memset(DBUS_RECIVE_DOUBLE_BUF,0,DBUS_MAX_RECIVE_BUF);
 }
 
 
@@ -302,7 +310,6 @@ void Heart(u16 TargetAddress)//心跳函数
 {
 	//数据发送临时数组
 	char TX_BUF[11];
-	unsigned int TEMP[DBUS_MAX_LENGTH];
 	//存储CRC计算结果临时变量
 	u16 CRC;
 	FrameID++;
@@ -694,7 +701,7 @@ void Response_Read_Multiple_Registers(char *buf)
 	//释放动态开辟的空间
 	free(TX_BUF);
 	/*为了防止野指针产生*/
-  TX_BUF = NULL;	
+    TX_BUF = NULL;	
 }
  
 /*响应写多个寄存器*/ 

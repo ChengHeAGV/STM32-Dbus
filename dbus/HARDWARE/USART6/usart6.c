@@ -2,15 +2,16 @@
 #include "usart6.h"
 #include "stdarg.h"	 	 
 #include "stdio.h"	 	 
-#include "string.h"	  
+#include "string.h"	
+#include "dbus.h"
 
 //串口发送缓存区 	
 __align(8) char USART6_TX_BUF[USART6_MAX_SEND_LEN]; 	//发送缓冲,最大USART6_MAX_SEND_LEN字节
 #ifdef USART6_RX_EN   								//如果使能了接收   	  
 //串口接收缓存区 	
 char USART6_RX_BUF[USART6_MAX_RECV_LEN]; 				//接收缓冲,最大USART6_MAX_RECV_LEN个字节.
-u8 TxCounter6=0;
-u8 RxCounter6=0;
+//u8 TxCounter6=0;
+//u8 RxCounter6=0;
 
 //通过判断接收连续2个字符之间的时间差不大于100ms来决定是不是一次连续的数据.
 //如果2个字符接收间隔超过100ms,则认为不是1次连续数据.也就是超过100ms没有接收到
@@ -21,13 +22,13 @@ u8 RxCounter6=0;
 u16 USART6_RX_STA=0;   	 
 void USART6_IRQHandler(void)
 {
-  char c=USART_ReceiveData(USART6);
-  USART6_RX_BUF[RxCounter6++]= c;   //将读寄存器的数据缓存到接收缓冲区里
-  InPut(c);	
-  if(USART_GetITStatus(USART6, USART_IT_TXE) != RESET)                   //这段是为了避免STM32 USART 第一个字节发不出去的BUG 
-  { 
-     USART_ITConfig(USART6, USART_IT_TXE, DISABLE);					     //禁止发缓冲器空中断， 
-  }										 
+//  USART6_RX_BUF[RxCounter6++]= c;   //将读寄存器的数据缓存到接收缓冲区里
+  if(USART_GetITStatus(USART6, USART_IT_RXNE) != RESET)                   //这段是为了避免STM32 USART 第一个字节发不出去的BUG 
+  {  
+    char c=USART_ReceiveData(USART6);
+    InPut(c);	
+    USART_ClearFlag(USART6, USART_IT_RXNE);
+  }	
 }  
 #endif	
 //初始化IO 串口6
