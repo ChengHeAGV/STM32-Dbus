@@ -90,6 +90,19 @@ CPU_STK TASK6_TASK_STK[TASK6_STK_SIZE];
 //任务函数
 void task6_task(void *p_arg);
 
+
+void WIFI_Send(char *str,u16 len)
+{
+	USART_OUT(USART6,str,len);
+}
+void delay()
+{
+    //OS_ERR *err;
+   // OSTimeDlyHMSM(0,0,0,10,OS_OPT_TIME_HMSM_STRICT,err);
+    delay_ms(10);
+}
+
+
 //主函数
 int main(void)
 {
@@ -110,6 +123,11 @@ int main(void)
 	TIM3_Int_Init(100-1,8400-1);	//10ms中断一次
 	Adc_Init();         //初始化ADC
 	W25QXX_Init();//FLASH初始化 
+    
+    //初始化DBUS
+	Dbus_Init(2);
+	OutPut_interrupt(WIFI_Send);	
+	Delay_interrupt(delay);
 	
 	OSInit(&err);		    //初始化UCOSIII
 	OS_CRITICAL_ENTER();	//进入临界区			 
@@ -248,11 +266,6 @@ void start_task(void *p_arg)
 	OSTaskDel((OS_TCB*)0,&err);	//删除start_task任务自身
 }
 
-void Delay(CPU_INT16U s,CPU_INT32U mm,OS_ERR *err)
-{
-	OSTimeDlyHMSM(0,0,s,mm,OS_OPT_TIME_HMSM_STRICT,err);
-}
-
 //src:指令
 //dst:返回信息
 //timeout:超时时间
@@ -274,6 +287,7 @@ int check(char* dst,u16 timeout,char* src,...)
 	{
 		//resault=strstr(USART6_RX_BUF,dst);
 		delay_ms(10);
+        
 		num++;
 	}
 	memset(USART6_RX_BUF,0,USART6_MAX_RECV_LEN);
@@ -289,7 +303,7 @@ int check(char* dst,u16 timeout,char* src,...)
 
 char* AP="geekiot";
 char* PASSWORD="8008208820";
-char* HOST_IP="192.168.23.3";
+char* HOST_IP="192.168.191.3";
 char* HOST_PORT="18666";
 //task1任务函数
 void task1_task(void *p_arg)
@@ -302,22 +316,9 @@ void task1_task(void *p_arg)
 		LED0 = 1;
 	}
 }
-u8 WIFI_BUSY = 0;
-void WIFI_Send(char *str,u16 len)
-{
-    while(WIFI_BUSY)
-    {
-        delay_ms(10);
-    }
-    WIFI_BUSY = 1;
-	USART_OUT(USART6,str,len);
-    WIFI_BUSY = 0;
-}
-void delay()
-{
-    delay_ms(1);
-}
+
 //task2任务函数
+struct ReturnMsg rm;
 void task2_task(void *p_arg)
 {
 	/////////////配置wifi//////////////////
@@ -339,16 +340,21 @@ void task2_task(void *p_arg)
 		check(">",1000,"AT+CIPSEND\r\n");//		
 	//}
 	////////////////////////////////////////
-	//初始化DBUS
-	Dbus_Init(2);
-	OutPut_interrupt(WIFI_Send);	
-	Delay_interrupt(delay);
+
+    u16 num;
+    Dbus_Register[0]=0x1122;
+    Dbus_Register[1]=0x3366;
+    Dbus_Register[3]=0xaabb;
 	while(1)
 	{
-        Heart(1);
+//        num++;
+        //Heart(1);
 		delay_ms(1000);
-        delay_ms(1000);
-        delay_ms(1000);
+//        delay_ms(1000);
+//        delay_ms(1000);
+//        delay_ms(1000);
+        //Write_Register(1,1,num);
+        //rm = Read_Register(1,1);
 	}
 }
 
@@ -357,24 +363,23 @@ void task3_task(void *p_arg)
 {
 	while(1)
 	{
-		delay_ms(10);
+       // 
+		delay_ms(1000);
 	}
 }
 
 //task4任务函数
 void task4_task(void *p_arg)
 {
-
-
 	while(1)
 	{
     
+		   delay_ms(10);
         //收到结束符触发解包函 
         if (DBUS_RECIVE_BUF[DBUS_RECIVE_LEN - 1] == DBUS_END)
         {
             OpenBox();
         }
-		delay_ms(10);
 	}
 }
 

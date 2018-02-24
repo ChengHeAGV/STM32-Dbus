@@ -16,24 +16,25 @@
   ******************************************************************************
 */
 
+
+
 	#ifndef __DBUS_H
 	#define	__DBUS_H
 		
 	#define u8  unsigned char
 	#define u16 unsigned short
 
-
 	/*--- 用户配置 ---------------------------------------------------------------*/
 	//读写寄存器长度
 	#define DBUS_REGISTER_LENGTH 128
 	//单帧数据帧最大长度
-	#define DBUS_MAX_LENGTH 256
+	#define DBUS_MAX_LENGTH 269
 	//数据接收缓冲池长度
-	#define DBUS_MAX_RECIVE_BUF 1024
+	#define DBUS_MAX_RECIVE_BUF 512
 	//响应消息队列缓冲池长度
 	#define DBUS_MAX_RESPONSE_BUF 20
-	//超时时间(单位:ms)
-	#define DBUS_TIMEOUT 200
+	//超时时间(单位:10ms)
+	#define DBUS_TIMEOUT 100
 	//重发次数
 	#define DBUS_MAX_REPEAT_NUM 3
 
@@ -43,6 +44,12 @@
 		u16 Data;
 		u16* DataBuf;
 	};
+    
+    //寄存器
+    extern u16 Dbus_Register[DBUS_REGISTER_LENGTH];
+
+    
+    
 	//数据接收缓冲池
     extern char DBUS_RECIVE_BUF[DBUS_MAX_RECIVE_BUF];
     //接收缓冲池中数据长度（当前长度）

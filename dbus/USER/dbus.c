@@ -13,6 +13,12 @@ char DBUS_RECIVE_BUF[DBUS_MAX_RECIVE_BUF];
 //响应消息队列缓冲池长度
 char DBUS_RESPONSE_BUF[DBUS_MAX_RESPONSE_BUF][DBUS_MAX_LENGTH];
 
+//接收双缓冲
+char DBUS_RECIVE_DOUBLE_BUF[DBUS_MAX_RECIVE_BUF];
+//接收双双缓冲长度
+u16 DBUS_RECIVE_DOUBLE_LEN;
+
+
 //接收缓冲池中数据长度（当前长度）
 u16 DBUS_RECIVE_LEN;
 
@@ -151,7 +157,13 @@ void Dbus_Init(u16 Address)
 void InPut(char c) 
 {
 	//将收到的数据追加到接收缓存
-	DBUS_RECIVE_BUF[DBUS_RECIVE_LEN++] = c;
+    //if(DBUS_RECIVE_LEN<DBUS_MAX_RECIVE_BUF)
+        DBUS_RECIVE_BUF[DBUS_RECIVE_LEN++] = c;
+//    else
+//    {
+//        //超过最大长度限制
+//        DBUS_RECIVE_BUF[DBUS_RECIVE_LEN-1] = DBUS_END;
+//    }
 }
 
 
@@ -162,21 +174,19 @@ void OpenBox()
 	char temp[DBUS_MAX_LENGTH];
 	//单帧转换后的数组
 	char buf[DBUS_MAX_LENGTH];
-	
-    //接收双缓冲
-    char DBUS_RECIVE_DOUBLE_BUF[DBUS_MAX_RECIVE_BUF];
-    //接收双双缓冲长度
-    u16 DBUS_RECIVE_DOUBLE_LEN = DBUS_RECIVE_LEN;
-    
+	    
     //复制缓冲区数据到双缓冲
     memcpy(DBUS_RECIVE_DOUBLE_BUF,DBUS_RECIVE_BUF,DBUS_RECIVE_LEN);
+    //更新双缓冲长度
+    DBUS_RECIVE_DOUBLE_LEN = DBUS_RECIVE_LEN;
+
     //复位接收缓冲区
     memset(DBUS_RECIVE_BUF,0,DBUS_MAX_RECIVE_BUF);
     //清空接收缓冲长度
     DBUS_RECIVE_LEN = 0;
     
     //开始标志
-    u16 Start = 0;
+    u16 Start = 0; 
     //结束标志
     u16 Stop = 0;
     //搜索结果
@@ -224,9 +234,11 @@ void OpenBox()
             //退出循环
             break;
         }
+        //延时10ms，防止实时系统调用时卡死
+		DELAY_CALLBACK();
 	}
     //复位接收缓冲区
-    memset(DBUS_RECIVE_DOUBLE_BUF,0,DBUS_MAX_RECIVE_BUF);
+   memset(DBUS_RECIVE_DOUBLE_BUF,0,DBUS_MAX_RECIVE_BUF);
 }
 
 
@@ -272,9 +284,10 @@ void Analyze(char *buf ,u8 len)
 						//缓冲池第1字节为帧长度
 						DBUS_RESPONSE_BUF[i][0] = len;
 						//将该响应帧加入缓冲池
-						for(int j=0;i<len;j++)
+						for(int j=0;j<len;j++)
 							DBUS_RESPONSE_BUF[i][j+1] = buf[j];
 					}
+                    len=len;
 				}
 			}
 		} 
@@ -370,13 +383,13 @@ struct ReturnMsg Read_Register(u16 TargetAddress,u16 RegisterAddress)
 					if(((DBUS_RESPONSE_BUF[i][1]<<8)|DBUS_RESPONSE_BUF[i][2]) == frameid)
 					{
 						msg.resault = 1;
-						msg.Data = DBUS_RESPONSE_BUF[i][10]<<8|DBUS_RESPONSE_BUF[i][11];
+						msg.Data = DBUS_RESPONSE_BUF[i][11]<<8|DBUS_RESPONSE_BUF[i][12];
 						DBUS_RESPONSE_BUF[i][0]=0;
 						return msg;
 					}
 				}
 			}
-			//延时1ms，防止实时系统调用时卡死
+			//延时10ms，防止实时系统调用时卡死
 			DELAY_CALLBACK();
 		}
 	}
@@ -425,7 +438,7 @@ struct ReturnMsg Read_Multiple_Registers(u16 TargetAddress,u16 RegisterAddress,u
 						msg.resault = 1;
 						for(int t=0;t<Num;t++)
 						{
-							msg.DataBuf[t] = DBUS_RESPONSE_BUF[i][11+2*t]<<8|DBUS_RESPONSE_BUF[i][12+2*t];
+							msg.DataBuf[t] = DBUS_RESPONSE_BUF[i][12+2*t]<<8|DBUS_RESPONSE_BUF[i][13+2*t];
 						}
 						DBUS_RESPONSE_BUF[i][0]=0;
 						return msg;
@@ -490,7 +503,7 @@ u8 Write_Register(u16 TargetAddress,u16 RegisterAddress,u16 Data)//写单个寄存器
 					}
 				}
 			}
-			//延时1ms，防止实时系统调用时卡死
+			//延时10ms，防止实时系统调用时卡死
 			DELAY_CALLBACK();
 		}
 	}
@@ -511,7 +524,7 @@ u8 Write_Register(u16 TargetAddress,u16 RegisterAddress,u16 Data)//写单个寄存器
 u8 Write_Multiple_Registers(u16 TargetAdress,u16 RegisterAddress,u8 Num,u16* Data)//写单个寄存器
 {
 	u16 CRC=0;
-	char *TX_BUF=(char *)malloc((11+2*Num+2)*sizeof(char));//定义动态数组TX_BUF[11+2*Num+2];
+	char TX_BUF[DBUS_MAX_LENGTH];
 	FrameID++;
 	u16 frameid = FrameID;
 	
@@ -553,11 +566,6 @@ u8 Write_Multiple_Registers(u16 TargetAdress,u16 RegisterAddress,u8 Num,u16* Dat
 					if(((DBUS_RESPONSE_BUF[i][1]<<8)|DBUS_RESPONSE_BUF[i][2]) == frameid)
 					{
 						DBUS_RESPONSE_BUF[i][0]=0;
-						
-						//释放动态开辟的空间
-						free(TX_BUF);
-						/*为了防止野指针产生*/
-						TX_BUF = NULL;
 						return 1;
 					}
 				}
@@ -566,11 +574,6 @@ u8 Write_Multiple_Registers(u16 TargetAdress,u16 RegisterAddress,u8 Num,u16* Dat
 			DELAY_CALLBACK();
 		}
 	}
-	
-	//释放动态开辟的空间
-	free(TX_BUF);
-	/*为了防止野指针产生*/
-  TX_BUF = NULL;
 	return 0;
 }
 
@@ -659,7 +662,7 @@ void Response_Read_Multiple_Registers(char *buf)
 {
 	u16 CRC=0;	
 	u8 Num = buf[10];
-	char *TX_BUF=(char *)malloc((11+2*Num+2)*sizeof(char));//定义动态数组TX_BUF[11+2*Num+2];
+	char TX_BUF[300];//定义数组;
 	//待读取寄存器起始地址
 	u16 regStartAdd = buf[8]<<8|buf[9];
 	
@@ -697,11 +700,6 @@ void Response_Read_Multiple_Registers(char *buf)
 	
 	//发送数据
 	Send(TX_BUF,11+Num*2+2);
-	
-	//释放动态开辟的空间
-	free(TX_BUF);
-	/*为了防止野指针产生*/
-    TX_BUF = NULL;	
 }
  
 /*响应写多个寄存器*/ 
