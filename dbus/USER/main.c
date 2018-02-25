@@ -346,15 +346,16 @@ void task2_task(void *p_arg)
     Dbus_Register[0]=0x1122;
     Dbus_Register[1]=0x3366;
     Dbus_Register[3]=0xaabb;
+	Heart(1);
 	while(1)
 	{
-        Heart(1);
        num++;
 		if(num==15)
 		{
 			num=0;
-			delay_ms(1000);
+      Heart(1);
 		}
+		delay_ms(1000);
 //		OSTimeDlyHMSM(0,0,20,0,OS_OPT_TIME_HMSM_STRICT,err);
 //        delay_ms(1000);
 //        delay_ms(1000);

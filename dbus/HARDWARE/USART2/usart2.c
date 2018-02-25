@@ -99,7 +99,7 @@ void u2_printf(char* fmt,...)
 	
 }
 
-void USART_OUT(USART_TypeDef* USARTx, char *Data,uint8_t len)
+void USART_OUT(USART_TypeDef* USARTx, char *Data,u16 len)
 { 
 	while(len--)
 		{				                          //判断是否到达字符串结束符

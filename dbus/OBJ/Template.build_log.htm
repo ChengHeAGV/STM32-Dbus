@@ -33,10 +33,19 @@ Warning: C3910W: Old syntax, please use '--c99'.
 main.c(324): warning:  #177-D: variable "err" was declared but never referenced
         OS_ERR *err;
 main.c: 2 warnings, 0 errors
+compiling timer.c...
+Warning: C3910W: Old syntax, please use '--c99'.
+compiling usart2.c...
+Warning: C3910W: Old syntax, please use '--c99'.
+compiling modus.c...
+Warning: C3910W: Old syntax, please use '--c99'.
+..\HARDWARE\MODBUS\modus.c(90): warning:  #167-D: argument of type "u8 *" is incompatible with parameter of type "char *"
+                USART_OUT(USART2,USART2_TX_BUF,TxCounter2);
+..\HARDWARE\MODBUS\modus.c: 1 warning, 0 errors
 linking...
-Program Size: Code=68292 RO-data=1964 RW-data=328 ZI-data=90904  
+Program Size: Code=68292 RO-data=1964 RW-data=328 ZI-data=70424  
 FromELF: creating hex file...
-"..\OBJ\Template.axf" - 0 Error(s), 2 Warning(s).
+"..\OBJ\Template.axf" - 0 Error(s), 3 Warning(s).
 
 <h2>Collection of Component include folders:</h2>
   D:\github\stm32\dbus\dbus\USER\RTE

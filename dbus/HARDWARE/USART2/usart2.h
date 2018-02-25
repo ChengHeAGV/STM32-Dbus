@@ -17,7 +17,7 @@ extern u16 USART2_RX_STA;   						//接收数据状态
 void usart2_init(u32 bound);				//串口2初始化 
 void TIM3_Int_Init(u16 arr,u16 psc);
 void u2_printf(char* fmt, ...);
-void USART_OUT(USART_TypeDef* USARTx, char *Data,uint8_t len);
+void USART_OUT(USART_TypeDef* USARTx, char *Data,u16 len);
 #endif
 
 

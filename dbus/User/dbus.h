@@ -28,7 +28,7 @@
 	//读写寄存器长度
 	#define DBUS_REGISTER_LENGTH 128
 	//单帧数据帧最大长度
-	#define DBUS_MAX_LENGTH 2048
+	#define DBUS_MAX_LENGTH 1024
 	//数据接收缓冲池长度
 	#define DBUS_MAX_RECIVE_BUF 2048
 	//响应消息队列缓冲池长度

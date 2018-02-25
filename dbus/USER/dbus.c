@@ -74,7 +74,7 @@ void Send(u8* buf,u16 len)
 	TX_BUF[0] = DBUS_HEAD;
 
 	//有效数据部分转成16进制ASCII码
-	for(int i=0;i<len;i++)
+	for(u16 i=0;i<len;i++)
 	{
 		hight = buf[i]/0x10;//取高位
 		low   = buf[i]%0x10;//取低位

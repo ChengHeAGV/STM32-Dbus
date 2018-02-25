@@ -3,9 +3,9 @@
 <title>Static Call Graph - [..\OBJ\Template.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image ..\OBJ\Template.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5050106: Last Updated: Sun Feb 25 18:23:45 2018
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5050106: Last Updated: Sun Feb 25 23:29:39 2018
 <BR><P>
-<H3>Maximum Stack Usage =       8288 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
+<H3>Maximum Stack Usage =       4192 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
 task4_task &rArr; OpenBox &rArr; Analyze &rArr; Response_Read_Multiple_Registers &rArr; Send
 <P>
@@ -497,8 +497,8 @@ Global Symbols
 <LI><a href="#[a2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Response_Write_Multiple_Registers
 </UL>
 
-<P><STRONG><a name="[a4]"></a>Send</STRONG> (Thumb, 164 bytes, Stack size 2072 bytes, dbus.o(.text))
-<BR><BR>[Stack]<UL><LI>Max Depth = 2072<LI>Call Chain = Send
+<P><STRONG><a name="[a4]"></a>Send</STRONG> (Thumb, 166 bytes, Stack size 1048 bytes, dbus.o(.text))
+<BR><BR>[Stack]<UL><LI>Max Depth = 1048<LI>Call Chain = Send
 </UL>
 <BR>[Called By]<UL><LI><a href="#[b0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Write_Multiple_Registers
 <LI><a href="#[af]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Write_Register
@@ -528,7 +528,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[a2]"></a>Response_Write_Multiple_Registers</STRONG> (Thumb, 166 bytes, Stack size 32 bytes, dbus.o(.text))
-<BR><BR>[Stack]<UL><LI>Max Depth = 2104<LI>Call Chain = Response_Write_Multiple_Registers &rArr; Send
+<BR><BR>[Stack]<UL><LI>Max Depth = 1080<LI>Call Chain = Response_Write_Multiple_Registers &rArr; Send
 </UL>
 <BR>[Calls]<UL><LI><a href="#[a4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Send
 <LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CRC_CALC
@@ -536,8 +536,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[a8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Analyze
 </UL>
 
-<P><STRONG><a name="[a5]"></a>Response_Read_Multiple_Registers</STRONG> (Thumb, 226 bytes, Stack size 2072 bytes, dbus.o(.text))
-<BR><BR>[Stack]<UL><LI>Max Depth = 4144<LI>Call Chain = Response_Read_Multiple_Registers &rArr; Send
+<P><STRONG><a name="[a5]"></a>Response_Read_Multiple_Registers</STRONG> (Thumb, 226 bytes, Stack size 1048 bytes, dbus.o(.text))
+<BR><BR>[Stack]<UL><LI>Max Depth = 2096<LI>Call Chain = Response_Read_Multiple_Registers &rArr; Send
 </UL>
 <BR>[Calls]<UL><LI><a href="#[a4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Send
 <LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CRC_CALC
@@ -546,7 +546,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[a6]"></a>Response_Write_Register</STRONG> (Thumb, 132 bytes, Stack size 32 bytes, dbus.o(.text))
-<BR><BR>[Stack]<UL><LI>Max Depth = 2104<LI>Call Chain = Response_Write_Register &rArr; Send
+<BR><BR>[Stack]<UL><LI>Max Depth = 1080<LI>Call Chain = Response_Write_Register &rArr; Send
 </UL>
 <BR>[Calls]<UL><LI><a href="#[a4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Send
 <LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CRC_CALC
@@ -555,7 +555,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[a7]"></a>Response_Read_Register</STRONG> (Thumb, 150 bytes, Stack size 32 bytes, dbus.o(.text))
-<BR><BR>[Stack]<UL><LI>Max Depth = 2104<LI>Call Chain = Response_Read_Register &rArr; Send
+<BR><BR>[Stack]<UL><LI>Max Depth = 1080<LI>Call Chain = Response_Read_Register &rArr; Send
 </UL>
 <BR>[Calls]<UL><LI><a href="#[a4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Send
 <LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CRC_CALC
@@ -564,7 +564,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[a8]"></a>Analyze</STRONG> (Thumb, 214 bytes, Stack size 24 bytes, dbus.o(.text))
-<BR><BR>[Stack]<UL><LI>Max Depth = 4168<LI>Call Chain = Analyze &rArr; Response_Read_Multiple_Registers &rArr; Send
+<BR><BR>[Stack]<UL><LI>Max Depth = 2120<LI>Call Chain = Analyze &rArr; Response_Read_Multiple_Registers &rArr; Send
 </UL>
 <BR>[Calls]<UL><LI><a href="#[a7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Response_Read_Register
 <LI><a href="#[a6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Response_Write_Register
@@ -575,8 +575,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[a9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;OpenBox
 </UL>
 
-<P><STRONG><a name="[a9]"></a>OpenBox</STRONG> (Thumb, 208 bytes, Stack size 4120 bytes, dbus.o(.text))
-<BR><BR>[Stack]<UL><LI>Max Depth = 8288<LI>Call Chain = OpenBox &rArr; Analyze &rArr; Response_Read_Multiple_Registers &rArr; Send
+<P><STRONG><a name="[a9]"></a>OpenBox</STRONG> (Thumb, 204 bytes, Stack size 2072 bytes, dbus.o(.text))
+<BR><BR>[Stack]<UL><LI>Max Depth = 4192<LI>Call Chain = OpenBox &rArr; Analyze &rArr; Response_Read_Multiple_Registers &rArr; Send
 </UL>
 <BR>[Calls]<UL><LI><a href="#[a8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Analyze
 <LI><a href="#[a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HexStrToDec
@@ -595,7 +595,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[ac]"></a>Heart</STRONG> (Thumb, 98 bytes, Stack size 32 bytes, dbus.o(.text))
-<BR><BR>[Stack]<UL><LI>Max Depth = 2104<LI>Call Chain = Heart &rArr; Send
+<BR><BR>[Stack]<UL><LI>Max Depth = 1080<LI>Call Chain = Heart &rArr; Send
 </UL>
 <BR>[Calls]<UL><LI><a href="#[a4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Send
 <LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CRC_CALC
@@ -613,12 +613,12 @@ Global Symbols
 <LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CRC_CALC
 </UL>
 
-<P><STRONG><a name="[af]"></a>Write_Register</STRONG> (Thumb, 292 bytes, Stack size 48 bytes, dbus.o(.text), UNUSED)
+<P><STRONG><a name="[af]"></a>Write_Register</STRONG> (Thumb, 290 bytes, Stack size 48 bytes, dbus.o(.text), UNUSED)
 <BR><BR>[Calls]<UL><LI><a href="#[a4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Send
 <LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CRC_CALC
 </UL>
 
-<P><STRONG><a name="[b0]"></a>Write_Multiple_Registers</STRONG> (Thumb, 298 bytes, Stack size 2088 bytes, dbus.o(.text), UNUSED)
+<P><STRONG><a name="[b0]"></a>Write_Multiple_Registers</STRONG> (Thumb, 298 bytes, Stack size 1064 bytes, dbus.o(.text), UNUSED)
 <BR><BR>[Calls]<UL><LI><a href="#[a4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Send
 <LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CRC_CALC
 </UL>
@@ -655,7 +655,7 @@ Global Symbols
 <BR>[Address Reference Count : 1]<UL><LI> main.o(.text)
 </UL>
 <P><STRONG><a name="[b7]"></a>task4_task</STRONG> (Thumb, 32 bytes, Stack size 0 bytes, main.o(.text))
-<BR><BR>[Stack]<UL><LI>Max Depth = 8288 + Unknown Stack Size
+<BR><BR>[Stack]<UL><LI>Max Depth = 4192 + Unknown Stack Size
 <LI>Call Chain = task4_task &rArr; OpenBox &rArr; Analyze &rArr; Response_Read_Multiple_Registers &rArr; Send
 </UL>
 <BR>[Calls]<UL><LI><a href="#[b4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;delay_ms
@@ -687,8 +687,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[be]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task2_task
 </UL>
 
-<P><STRONG><a name="[be]"></a>task2_task</STRONG> (Thumb, 118 bytes, Stack size 8 bytes, main.o(.text))
-<BR><BR>[Stack]<UL><LI>Max Depth = 2112 + Unknown Stack Size
+<P><STRONG><a name="[be]"></a>task2_task</STRONG> (Thumb, 124 bytes, Stack size 8 bytes, main.o(.text))
+<BR><BR>[Stack]<UL><LI>Max Depth = 1088 + Unknown Stack Size
 <LI>Call Chain = task2_task &rArr; Heart &rArr; Send
 </UL>
 <BR>[Calls]<UL><LI><a href="#[bf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;u6_printf
