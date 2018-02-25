@@ -445,10 +445,10 @@ ARM Macro Assembler    Page 7
   311 00000220                 END
 Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4.fp --apcs=int
 erwork --depend=..\obj\lib_mem_a.d -o..\obj\lib_mem_a.o -ID:\github\stm32\dbus\
-dbus\USER\RTE -IC:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.7.0 -IC:\Keil_v5\ARM\C
-MSIS\Include -IC:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.7.0\Device\Include --pr
-edefine="__UVISION_VERSION SETA 514" --predefine="STM32F407xx SETA 1" --list=..
-\obj\lib_mem_a.lst ..\UCOSIII\uC-LIB\Ports\ARM-Cortex-M4\RealView\lib_mem_a.asm
+dbus\USER\RTE -IC:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include -IC
+:\Keil_v5\ARM\CMSIS\Include --predefine="__UVISION_VERSION SETA 514" --predefin
+e="STM32F40_41xxx SETA 1" --list=..\obj\lib_mem_a.lst ..\UCOSIII\uC-LIB\Ports\A
+RM-Cortex-M4\RealView\lib_mem_a.asm
 
 
 

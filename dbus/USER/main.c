@@ -59,7 +59,7 @@ void task3_task(void *p_arg);
 //任务优先级
 #define TASK4_TASK_PRIO		7
 //任务堆栈大小	
-#define TASK4_STK_SIZE 		256
+#define TASK4_STK_SIZE 		4096
 //任务控制块
 OS_TCB Task4_TaskTCB;
 //任务堆栈	
@@ -124,7 +124,7 @@ int main(void)
 	Adc_Init();         //初始化ADC
 	W25QXX_Init();//FLASH初始化 
     
-    //初始化DBUS
+  //初始化DBUS
 	Dbus_Init(2);
 	OutPut_interrupt(WIFI_Send);	
 	Delay_interrupt(delay);
@@ -303,7 +303,7 @@ int check(char* dst,u16 timeout,char* src,...)
 
 char* AP="geekiot";
 char* PASSWORD="8008208820";
-char* HOST_IP="192.168.191.3";
+char* HOST_IP="192.168.31.123";
 char* HOST_PORT="18666";
 //task1任务函数
 void task1_task(void *p_arg)
@@ -321,6 +321,7 @@ void task1_task(void *p_arg)
 struct ReturnMsg rm;
 void task2_task(void *p_arg)
 {
+	OS_ERR *err;
 	/////////////配置wifi//////////////////
 	//等待8266复位
 	delay_ms(1000);//ms<1840
@@ -347,14 +348,19 @@ void task2_task(void *p_arg)
     Dbus_Register[3]=0xaabb;
 	while(1)
 	{
-//        num++;
-        //Heart(1);
-		delay_ms(1000);
+        Heart(1);
+       num++;
+		if(num==15)
+		{
+			num=0;
+			delay_ms(1000);
+		}
+//		OSTimeDlyHMSM(0,0,20,0,OS_OPT_TIME_HMSM_STRICT,err);
 //        delay_ms(1000);
 //        delay_ms(1000);
 //        delay_ms(1000);
-        //Write_Register(1,1,num);
-        //rm = Read_Register(1,1);
+				//Write_Register(1,1,num);
+				//rm = Read_Register(1,1);
 	}
 }
 

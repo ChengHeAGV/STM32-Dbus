@@ -28,9 +28,9 @@
 	//读写寄存器长度
 	#define DBUS_REGISTER_LENGTH 128
 	//单帧数据帧最大长度
-	#define DBUS_MAX_LENGTH 269
+	#define DBUS_MAX_LENGTH 2048
 	//数据接收缓冲池长度
-	#define DBUS_MAX_RECIVE_BUF 512
+	#define DBUS_MAX_RECIVE_BUF 2048
 	//响应消息队列缓冲池长度
 	#define DBUS_MAX_RESPONSE_BUF 20
 	//超时时间(单位:10ms)
@@ -64,7 +64,7 @@
 	//解包函数
 	extern void OpenBox(void);
 	//解析函数
-	extern void Analyze(char *buf ,u8 len);
+	extern void Analyze(char *buf ,u16 len);
 	//输出数据中断
 	extern void OutPut_interrupt(void (*callback_fun)(char*,u16));
 	//延时中断
@@ -74,11 +74,11 @@
 	//写单个寄存器
 	extern u8 Write_Register(u16 TargetAddress,u16 RegisterAddress,u16 Data);
 	//写多个寄存器
-	extern u8 Write_Multiple_Registers(u16 TargetAddress,u16 RegisterAddress,u8 Num,u16* Data);	
+	extern u8 Write_Multiple_Registers(u16 TargetAddress,u16 RegisterAddress,u16 Num,u16* Data);	
 	//读单个寄存器
 	extern struct ReturnMsg Read_Register(u16 TargetAddress,u16 RegisterAddress);
 	//读多个寄存器
-	extern struct ReturnMsg Read_Multiple_Registers(u16 TargetAddress,u16 RegisterAddress,u8 Num);	
+	extern struct ReturnMsg Read_Multiple_Registers(u16 TargetAddress,u16 RegisterAddress,u16 Num);	
 	
 	//响应读单个寄存器
 	void Response_Read_Register(char *buf);

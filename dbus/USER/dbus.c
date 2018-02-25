@@ -63,7 +63,7 @@ u16 CRC_CALC(char *chData,unsigned short uNo)
 }
 
 /*********发送函数******************************************************************/
-void Send(u8* buf,u8 len)
+void Send(u8* buf,u16 len)
 {
 	//数据发送临时数组
 	u8 TX_BUF[DBUS_MAX_LENGTH];
@@ -110,10 +110,10 @@ void Send(u8* buf,u8 len)
 /*********将16进制字符串转数值******************************************************************/
 void HexStrToDec(char* str,u8* dec)
 {
-	u8 l;
-    u8 hight=0;
-	u8 low=0  ;
-    l=strlen(str);
+	u16 l;
+  u16 hight=0;
+	u16 low=0  ;
+  l=strlen(str);
     
 	for(int i=0;i<l ;i++)
 	{   
@@ -246,7 +246,7 @@ void OpenBox()
 /*校验并解析数据帧
  *@Return          NONE 
 */
-void Analyze(char *buf ,u8 len)
+void Analyze(char *buf ,u16 len)
 {
 	u16 CRC;
 	u8 C1,C2;
@@ -397,7 +397,7 @@ struct ReturnMsg Read_Register(u16 TargetAddress,u16 RegisterAddress)
 	return msg;
 }
 //读多个寄存器
-struct ReturnMsg Read_Multiple_Registers(u16 TargetAddress,u16 RegisterAddress,u8 Num)
+struct ReturnMsg Read_Multiple_Registers(u16 TargetAddress,u16 RegisterAddress,u16 Num)
 {
 	u16 CRC=0;	
 	char TX_BUF[13];
@@ -521,7 +521,7 @@ u8 Write_Register(u16 TargetAddress,u16 RegisterAddress,u16 Data)//写单个寄存器
  *@Data            待写入数值指针
  *@Return          1:写入成功，0:写入失败  
 */
-u8 Write_Multiple_Registers(u16 TargetAdress,u16 RegisterAddress,u8 Num,u16* Data)//写单个寄存器
+u8 Write_Multiple_Registers(u16 TargetAdress,u16 RegisterAddress,u16 Num,u16* Data)//写单个寄存器
 {
 	u16 CRC=0;
 	char TX_BUF[DBUS_MAX_LENGTH];
@@ -661,8 +661,8 @@ void Response_Write_Register(char *buf)
 void Response_Read_Multiple_Registers(char *buf)
 {
 	u16 CRC=0;	
-	u8 Num = buf[10];
-	char TX_BUF[300];//定义数组;
+	u16 Num = buf[10];
+	char TX_BUF[DBUS_MAX_LENGTH];//定义数组;
 	//待读取寄存器起始地址
 	u16 regStartAdd = buf[8]<<8|buf[9];
 	
@@ -709,7 +709,7 @@ void Response_Write_Multiple_Registers(char *buf)
 	char TX_BUF[11];
 	//待写入寄存器起始地址
 	u16 regStartAdd = buf[8]<<8|buf[9];
-	u8 Num = buf[10];
+	u16 Num = buf[10];
 	//回复响应帧
 	TX_BUF[0] = buf[0];//帧ID高
 	TX_BUF[1] = buf[1];//帧ID低	
