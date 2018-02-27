@@ -1,0 +1,2 @@
+--create .\Objects\dbus.lib
+.\objects\dbus.o

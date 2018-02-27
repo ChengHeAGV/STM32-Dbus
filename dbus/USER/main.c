@@ -97,7 +97,7 @@ void WIFI_Send(char *str,u16 len)
 }
 void delay()
 {
-    OS_ERR *err;
+//    OS_ERR *err;
     //OSTimeDlyHMSM(0,0,0,10,OS_OPT_TIME_HMSM_STRICT,err);
     delay_ms(10);
 }
@@ -125,7 +125,7 @@ int main(void)
 	W25QXX_Init();//FLASH初始化 
     
   //初始化DBUS
-	Dbus_Init(2);
+	Dbus_Init(1);
 	OutPut_interrupt(WIFI_Send);	
 	Delay_interrupt(delay);
 	
@@ -303,7 +303,7 @@ int check(char* dst,u16 timeout,char* src,...)
 
 char* AP="geekiot";
 char* PASSWORD="8008208820";
-char* HOST_IP="192.168.191.4";
+char* HOST_IP="192.168.191.3";
 char* HOST_PORT="18666";
 //task1任务函数
 void task1_task(void *p_arg)
@@ -322,6 +322,7 @@ struct ReturnMsg rm;
 void task2_task(void *p_arg)
 {
 	OS_ERR *err;
+    u16 num=0;
 	/////////////配置wifi//////////////////
 	//等待8266复位
 	delay_ms(1000);//ms<1840
@@ -330,9 +331,9 @@ void task2_task(void *p_arg)
 	//AT模式
 	//if(check("OK",500,"AT\r\n"))
 	//{
-//		check("OK",1000,"AT+CWMODE=1\r\n");//配置为STATION模式 no change
-//		
-//		check("OK",15000,"AT+CWJAP=\"%s\",\"%s\"\r\n",AP,PASSWORD);//加入AP
+		//check("OK",1000,"AT+CWMODE=1\r\n");//配置为STATION模式 no change
+		
+		//check("OK",15000,"AT+CWJAP=\"%s\",\"%s\"\r\n",AP,PASSWORD);//加入AP
 		
 		check("OK",1000,"AT+CIPSTART=\"UDP\",\"%s\",%s\r\n",HOST_IP,HOST_PORT);//配置UDP ALREAY CONNECT
 		
@@ -342,7 +343,6 @@ void task2_task(void *p_arg)
 	//}
 	////////////////////////////////////////
 
-    u16 num=0;
     Dbus_Register[0]=0x1122;
     Dbus_Register[1]=0x3366;
     Dbus_Register[3]=0xaabb;
@@ -353,31 +353,35 @@ void task2_task(void *p_arg)
 		if(num==5)
 		{
 			num=0;
-            Heart(1);
+            Heart(0);
 		}
-		delay_ms(10);
-        for(int i=0;i<DBUS_REGISTER_LENGTH;i++)
-        {
-            Dbus_Register[i]=rand();
-        }
-        Write_Multiple_Registers(1,0,128,Dbus_Register);
-        rm = Read_Multiple_Registers(1,0,128);
+		delay_ms(1000);
+       
   
 //		OSTimeDlyHMSM(0,0,1,0,OS_OPT_TIME_HMSM_STRICT,err);
 //        delay_ms(1000);
 //        delay_ms(1000);
 //        delay_ms(1000);
-//				Write_Register(1,1,num);
-//				rm = Read_Register(1,1);
+//				Write_Register(0,1,num);
+//				rm = Read_Register(0,1);
 	}
 }
 
 //task3任务函数
 void task3_task(void *p_arg)
 {
+    delay_ms(1000);
+    delay_ms(1000);
+    delay_ms(1000);
+    delay_ms(1000);
 	while(1)
 	{
-       // 
+//        for(int i=0;i<DBUS_REGISTER_LENGTH;i++)
+//        {
+//            Dbus_Register[i]=rand();
+//        }
+//        Write_Multiple_Registers(0,0,128,Dbus_Register);
+//        rm = Read_Multiple_Registers(0,0,128);
 		delay_ms(1000);
 	}
 }

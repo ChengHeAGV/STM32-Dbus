@@ -1,0 +1,6 @@
+--cpu Cortex-M4.fp
+".\objects\dbus.o"
+--strict --scatter ".\Objects\dbus.sct"
+--summary_stderr --info summarysizes --map --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list ".\Listings\dbus.map" -o .\Objects\dbus.axf
