@@ -59,7 +59,7 @@ void task3_task(void *p_arg);
 //任务优先级
 #define TASK4_TASK_PRIO		7
 //任务堆栈大小	
-#define TASK4_STK_SIZE 		4096
+#define TASK4_STK_SIZE 		1024
 //任务控制块
 OS_TCB Task4_TaskTCB;
 //任务堆栈	
@@ -97,8 +97,8 @@ void WIFI_Send(char *str,u16 len)
 }
 void delay()
 {
-    //OS_ERR *err;
-   // OSTimeDlyHMSM(0,0,0,10,OS_OPT_TIME_HMSM_STRICT,err);
+    OS_ERR *err;
+    //OSTimeDlyHMSM(0,0,0,10,OS_OPT_TIME_HMSM_STRICT,err);
     delay_ms(10);
 }
 
@@ -303,7 +303,7 @@ int check(char* dst,u16 timeout,char* src,...)
 
 char* AP="geekiot";
 char* PASSWORD="8008208820";
-char* HOST_IP="192.168.31.123";
+char* HOST_IP="192.168.191.4";
 char* HOST_PORT="18666";
 //task1任务函数
 void task1_task(void *p_arg)
@@ -342,7 +342,7 @@ void task2_task(void *p_arg)
 	//}
 	////////////////////////////////////////
 
-    u16 num;
+    u16 num=0;
     Dbus_Register[0]=0x1122;
     Dbus_Register[1]=0x3366;
     Dbus_Register[3]=0xaabb;
@@ -350,18 +350,25 @@ void task2_task(void *p_arg)
 	while(1)
 	{
        num++;
-		if(num==15)
+		if(num==5)
 		{
 			num=0;
-      Heart(1);
+            Heart(1);
 		}
-		delay_ms(1000);
-//		OSTimeDlyHMSM(0,0,20,0,OS_OPT_TIME_HMSM_STRICT,err);
+		delay_ms(10);
+        for(int i=0;i<DBUS_REGISTER_LENGTH;i++)
+        {
+            Dbus_Register[i]=rand();
+        }
+        Write_Multiple_Registers(1,0,128,Dbus_Register);
+        rm = Read_Multiple_Registers(1,0,128);
+
+//		OSTimeDlyHMSM(0,0,1,0,OS_OPT_TIME_HMSM_STRICT,err);
 //        delay_ms(1000);
 //        delay_ms(1000);
 //        delay_ms(1000);
-				//Write_Register(1,1,num);
-				//rm = Read_Register(1,1);
+//				Write_Register(1,1,num);
+//				rm = Read_Register(1,1);
 	}
 }
 
@@ -381,7 +388,7 @@ void task4_task(void *p_arg)
 	while(1)
 	{
     
-		   delay_ms(10);
+		 delay_ms(10);
         //收到结束符触发解包函 
         if (DBUS_RECIVE_BUF[DBUS_RECIVE_LEN - 1] == DBUS_END)
         {

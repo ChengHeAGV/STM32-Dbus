@@ -38,6 +38,15 @@ char* DBUS_REGEX = "$%[^!]";
 u16 FrameID=0;
 
 
+//单帧临时数组
+char OpenBox_temp[DBUS_MAX_LENGTH];
+//单帧转换后的数组
+char OpenBox_buf[DBUS_MAX_LENGTH];
+//编码前待发送数组
+char TX_BUF[DBUS_MAX_LENGTH];
+//编码后待发送数组
+char Send_TX_BUF[DBUS_MAX_LENGTH];
+
 /*********内部功能函数********************************************************************/
 			
 /*********CRC16校验*******************************************************************/
@@ -63,15 +72,14 @@ u16 CRC_CALC(char *chData,unsigned short uNo)
 }
 
 /*********发送函数******************************************************************/
-void Send(u8* buf,u16 len)
+void Send(char* buf,u16 len)
 {
-	//数据发送临时数组
-	u8 TX_BUF[DBUS_MAX_LENGTH];
 	u8 hight=0;
 	u8 low=0;
-	
+	//清空发送缓冲数组
+    memset(Send_TX_BUF,0,DBUS_MAX_LENGTH);
 	//消息头 
-	TX_BUF[0] = DBUS_HEAD;
+	Send_TX_BUF[0] = DBUS_HEAD;
 
 	//有效数据部分转成16进制ASCII码
 	for(u16 i=0;i<len;i++)
@@ -79,7 +87,7 @@ void Send(u8* buf,u16 len)
 		hight = buf[i]/0x10;//取高位
 		low   = buf[i]%0x10;//取低位
 		
-		if((hight>=0)&&(hight<=9))  
+		if(hight<=9)  
 		{  
 			hight += 0x30;  
 		}  
@@ -88,7 +96,7 @@ void Send(u8* buf,u16 len)
 			hight += 0x37;  
 		}  
 		
-		if((low>=0)&&(low<=9))  
+		if(low<=9)  
 		{  
 			low += 0x30;  
 		}  
@@ -97,22 +105,22 @@ void Send(u8* buf,u16 len)
 			low += 0x37;  
 		} 
 		
-		TX_BUF[2*i+1] = hight;
-		TX_BUF[2*i+2] = low;
+		Send_TX_BUF[2*i+1] = hight;
+		Send_TX_BUF[2*i+2] = low;
 	}
 	
 	//消息尾
-	TX_BUF[2*len+1]=DBUS_END;
+	Send_TX_BUF[2*len+1]=DBUS_END;
 	//调用发送回调函数
-	SEND_CALLBACK(TX_BUF,2*len+2);
+	SEND_CALLBACK(Send_TX_BUF,2*len+2);
 }
 
 /*********将16进制字符串转数值******************************************************************/
-void HexStrToDec(char* str,u8* dec)
+void HexStrToDec(char* str,char* dec)
 {
-	u16 l;
+  u16 l;
   u16 hight=0;
-	u16 low=0  ;
+  u16 low=0  ;
   l=strlen(str);
     
 	for(int i=0;i<l ;i++)
@@ -157,24 +165,26 @@ void Dbus_Init(u16 Address)
 void InPut(char c) 
 {
 	//将收到的数据追加到接收缓存
-    //if(DBUS_RECIVE_LEN<DBUS_MAX_RECIVE_BUF)
+    if(DBUS_RECIVE_LEN<DBUS_MAX_RECIVE_BUF)
         DBUS_RECIVE_BUF[DBUS_RECIVE_LEN++] = c;
-//    else
-//    {
-//        //超过最大长度限制
-//        DBUS_RECIVE_BUF[DBUS_RECIVE_LEN-1] = DBUS_END;
-//    }
+    else
+    {
+        //超过最大长度限制,在结尾增加结束标志，触发解包
+        DBUS_RECIVE_BUF[DBUS_RECIVE_LEN-1] = DBUS_END;
+    }
 }
 
 
 /*********解包函数******************************************************************/
 void OpenBox()
 {
-	//单帧临时数组
-	char temp[DBUS_MAX_LENGTH];
-	//单帧转换后的数组
-	char buf[DBUS_MAX_LENGTH];
-	    
+    //开始标志
+    u16 Start = 0; 
+    //结束标志
+    u16 Stop = 0;
+    //搜索结果
+    u8 reault = 0;
+
     //复制缓冲区数据到双缓冲
     memcpy(DBUS_RECIVE_DOUBLE_BUF,DBUS_RECIVE_BUF,DBUS_RECIVE_LEN);
     //更新双缓冲长度
@@ -184,13 +194,6 @@ void OpenBox()
     memset(DBUS_RECIVE_BUF,0,DBUS_MAX_RECIVE_BUF);
     //清空接收缓冲长度
     DBUS_RECIVE_LEN = 0;
-    
-    //开始标志
-    u16 Start = 0; 
-    //结束标志
-    u16 Stop = 0;
-    //搜索结果
-    u8 reault = 0;
     
     //循环搜索并解析有效数据
 	while (DBUS_RECIVE_DOUBLE_LEN>(Stop+1))
@@ -221,11 +224,11 @@ void OpenBox()
             else
             {
                 //将获取到的数据拷贝到临时数组
-                memcpy(temp,&DBUS_RECIVE_DOUBLE_BUF[Start+1],Stop-Start+1-2);
+                memcpy(OpenBox_temp,&DBUS_RECIVE_DOUBLE_BUF[Start+1],Stop-Start+1-2);
                 //将分包的十六进制字符串temp转换为数值数组buf
-                HexStrToDec(temp,buf);
+                HexStrToDec(OpenBox_temp,OpenBox_buf);
                 //执行解析函数
-                Analyze(buf,(Stop-Start+1-2)/2);//指针之差是字符串长度，应该除2
+                Analyze(OpenBox_buf,(Stop-Start+1-2)/2);//指针之差是字符串长度，应该除2
             }
             
         }
@@ -240,6 +243,7 @@ void OpenBox()
     //复位接收缓冲区
    memset(DBUS_RECIVE_DOUBLE_BUF,0,DBUS_MAX_RECIVE_BUF);
 }
+
 
 
 
@@ -287,13 +291,26 @@ void Analyze(char *buf ,u16 len)
 						for(int j=0;j<len;j++)
 							DBUS_RESPONSE_BUF[i][j+1] = buf[j];
 					}
-                    len=len;
+                    //响应池被占满,清空缓冲池，并将本次响应加入第一个缓冲区
+                    else if(i==DBUS_MAX_RESPONSE_BUF-1)
+                    {
+                        //清空缓冲池
+                        for(int k=0;k<DBUS_MAX_RESPONSE_BUF;k++)
+                            DBUS_RESPONSE_BUF[k][0] = 0;
+                        
+                        //缓冲池第1字节为帧长度
+						DBUS_RESPONSE_BUF[0][0] = len;
+						//将该响应帧加入缓冲池
+						for(int j=0;j<len;j++)
+							DBUS_RESPONSE_BUF[i][j+1] = buf[j];
+                    }
 				}
 			}
 		} 
 		
 	}
 }
+
 
 
 /*发送中断函数定义
@@ -321,13 +338,14 @@ void Delay_interrupt(void (*callback_delay)(void))
 */
 void Heart(u16 TargetAddress)//心跳函数
 {
-	//数据发送临时数组
-	char TX_BUF[11];
 	//存储CRC计算结果临时变量
 	u16 CRC;
 	FrameID++;
 	u16 frameid = FrameID;
-	
+
+	//清空发送缓冲区
+    memset(TX_BUF,0,DBUS_MAX_LENGTH);
+    
 	TX_BUF[0] = frameid>>8;//帧ID高
 	TX_BUF[1] = frameid;//帧ID低		
 	TX_BUF[2] = LocalAddress >>8;//本机地址高
@@ -348,11 +366,13 @@ void Heart(u16 TargetAddress)//心跳函数
 struct ReturnMsg Read_Register(u16 TargetAddress,u16 RegisterAddress)
 {
 	u16 CRC=0;	
-	char TX_BUF[12];
 	struct ReturnMsg msg;
 	FrameID++;
 	u16 frameid = FrameID;
-	
+
+	//清空发送缓冲区
+    memset(TX_BUF,0,DBUS_MAX_LENGTH);
+    
 	TX_BUF[0] = frameid>>8;//帧ID高
 	TX_BUF[1] = frameid;//帧ID低	
 	TX_BUF[2] = LocalAddress>>8;//本机地址高
@@ -400,11 +420,13 @@ struct ReturnMsg Read_Register(u16 TargetAddress,u16 RegisterAddress)
 struct ReturnMsg Read_Multiple_Registers(u16 TargetAddress,u16 RegisterAddress,u16 Num)
 {
 	u16 CRC=0;	
-	char TX_BUF[13];
 	struct ReturnMsg msg;
 	FrameID++;
 	u16 frameid = FrameID;
-	
+
+	//清空发送缓冲区
+    memset(TX_BUF,0,DBUS_MAX_LENGTH);
+    
 	TX_BUF[0] = frameid>>8;//帧ID高
 	TX_BUF[1] = frameid;//帧ID低	
 	TX_BUF[2] = LocalAddress>>8;//本机地址高
@@ -461,12 +483,13 @@ struct ReturnMsg Read_Multiple_Registers(u16 TargetAddress,u16 RegisterAddress,u
 */
 u8 Write_Register(u16 TargetAddress,u16 RegisterAddress,u16 Data)//写单个寄存器
 {
-	u16 CRC=0;	
-	char TX_BUF[14];
-	
+	u16 CRC=0;		
 	FrameID++;
 	u16 frameid = FrameID;
-	
+
+	//清空发送缓冲区
+    memset(TX_BUF,0,DBUS_MAX_LENGTH);
+    
 	TX_BUF[0] = frameid>>8;//帧ID高
 	TX_BUF[1] = frameid;//帧ID低	
 	TX_BUF[2] = LocalAddress>>8;//本机地址高
@@ -524,10 +547,12 @@ u8 Write_Register(u16 TargetAddress,u16 RegisterAddress,u16 Data)//写单个寄存器
 u8 Write_Multiple_Registers(u16 TargetAdress,u16 RegisterAddress,u16 Num,u16* Data)//写单个寄存器
 {
 	u16 CRC=0;
-	char TX_BUF[DBUS_MAX_LENGTH];
 	FrameID++;
 	u16 frameid = FrameID;
-	
+
+	//清空发送缓冲区
+    memset(TX_BUF,0,DBUS_MAX_LENGTH);
+    
 	TX_BUF[0] = frameid>>8;//帧ID高
 	TX_BUF[1] = frameid;//帧ID低		
 	TX_BUF[2] = LocalAddress>>8;//本机地址高
@@ -583,10 +608,12 @@ u8 Write_Multiple_Registers(u16 TargetAdress,u16 RegisterAddress,u16 Num,u16* Da
 void Response_Read_Register(char *buf)
 {
 	u16 CRC=0;	
-	char TX_BUF[14];
 	//待读取寄存器地址
 	u16 regAdd = buf[8]<<8|buf[9];
-	
+
+	//清空发送缓冲区
+    memset(TX_BUF,0,DBUS_MAX_LENGTH);
+    
 	TX_BUF[0] = buf[0];//帧ID高
 	TX_BUF[1] = buf[1];//帧ID低	
 	TX_BUF[2] = LocalAddress>>8;//本机地址高
@@ -621,12 +648,14 @@ void Response_Read_Register(char *buf)
 void Response_Write_Register(char *buf)
  {
 	u16 CRC=0;	
-	char TX_BUF[11];
 	//待写入寄存器地址
 	u16 regAdd = buf[8]<<8|buf[9];
 	//待写入数据
 	u16 data = (buf[10]<<8)|buf[11];
-	 	 
+
+	//清空发送缓冲区
+    memset(TX_BUF,0,DBUS_MAX_LENGTH);
+    
 	//回复响应帧
 	TX_BUF[0] = buf[0];//帧ID高
 	TX_BUF[1] = buf[1];//帧ID低	
@@ -662,10 +691,12 @@ void Response_Read_Multiple_Registers(char *buf)
 {
 	u16 CRC=0;	
 	u16 Num = buf[10];
-	char TX_BUF[DBUS_MAX_LENGTH];//定义数组;
 	//待读取寄存器起始地址
 	u16 regStartAdd = buf[8]<<8|buf[9];
-	
+
+	//清空发送缓冲区
+    memset(TX_BUF,0,DBUS_MAX_LENGTH);
+    
 	TX_BUF[0] = buf[0];//帧ID高
 	TX_BUF[1] = buf[1];//帧ID低	
 	TX_BUF[2] = LocalAddress>>8;//本机地址高
@@ -706,10 +737,13 @@ void Response_Read_Multiple_Registers(char *buf)
 void Response_Write_Multiple_Registers(char *buf)
  {
 	u16 CRC=0;	
-	char TX_BUF[11];
 	//待写入寄存器起始地址
 	u16 regStartAdd = buf[8]<<8|buf[9];
 	u16 Num = buf[10];
+
+	//清空发送缓冲区
+    memset(TX_BUF,0,DBUS_MAX_LENGTH);
+    
 	//回复响应帧
 	TX_BUF[0] = buf[0];//帧ID高
 	TX_BUF[1] = buf[1];//帧ID低	

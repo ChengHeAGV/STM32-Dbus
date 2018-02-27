@@ -32,7 +32,7 @@
 	//数据接收缓冲池长度
 	#define DBUS_MAX_RECIVE_BUF 2048
 	//响应消息队列缓冲池长度
-	#define DBUS_MAX_RESPONSE_BUF 20
+	#define DBUS_MAX_RESPONSE_BUF 10
 	//超时时间(单位:10ms)
 	#define DBUS_TIMEOUT 100
 	//重发次数
@@ -42,7 +42,7 @@
 	{
 		u8 resault;
 		u16 Data;
-		u16* DataBuf;
+		u16 DataBuf[DBUS_REGISTER_LENGTH];
 	};
     
     //寄存器
