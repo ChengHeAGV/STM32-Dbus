@@ -362,7 +362,7 @@ void task2_task(void *p_arg)
         }
         Write_Multiple_Registers(1,0,128,Dbus_Register);
         rm = Read_Multiple_Registers(1,0,128);
- 
+  
 //		OSTimeDlyHMSM(0,0,1,0,OS_OPT_TIME_HMSM_STRICT,err);
 //        delay_ms(1000);
 //        delay_ms(1000);
