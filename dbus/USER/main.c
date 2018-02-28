@@ -125,11 +125,11 @@ int main(void)
 	W25QXX_Init();//FLASH初始化 
     
   //初始化DBUS
-	Dbus_Init(1);
-	OutPut_interrupt(WIFI_Send);	
-	Delay_interrupt(delay);
-	
-	OSInit(&err);		    //初始化UCOSIII
+    Dbus.Init(5);
+	Dbus.OutPut_interrupt(WIFI_Send);	
+	Dbus.Delay_interrupt(delay);
+
+    OSInit(&err);		    //初始化UCOSIII
 	OS_CRITICAL_ENTER();	//进入临界区			 
 	//创建开始任务
 	OSTaskCreate((OS_TCB 	* )&StartTaskTCB,		//任务控制块
@@ -318,10 +318,8 @@ void task1_task(void *p_arg)
 }
 
 //task2任务函数
-struct ReturnMsg rm;
 void task2_task(void *p_arg)
 {
-	OS_ERR *err;
     u16 num=0;
 	/////////////配置wifi//////////////////
 	//等待8266复位
@@ -343,9 +341,9 @@ void task2_task(void *p_arg)
 	//}
 	////////////////////////////////////////
 
-    Dbus_Register[0]=0x1122;
-    Dbus_Register[1]=0x3366;
-    Dbus_Register[3]=0xaabb;
+    Dbus.Register[0]=0x1122;
+    Dbus.Register[1]=0x3366;
+    Dbus.Register[3]=0xaabb;
 	Heart(1);
 	while(1)
 	{
@@ -353,7 +351,8 @@ void task2_task(void *p_arg)
 		if(num==5)
 		{
 			num=0;
-            Heart(0);
+           // Heart(0);
+            Dbus.Heart(0);
 		}
 		delay_ms(1000);
        
@@ -363,24 +362,25 @@ void task2_task(void *p_arg)
 //        delay_ms(1000);
 //        delay_ms(1000);
 //				Write_Register(0,1,num);
-//				rm = Read_Register(0,1);
+				Dbus.ReturnMsg = Read_Register(0,1);
 	}
 }
 
 //task3任务函数
 void task3_task(void *p_arg)
 {
+    int i=0;
     delay_ms(1000);
     delay_ms(1000);
     delay_ms(1000);
     delay_ms(1000);
 	while(1)
 	{
-//        for(int i=0;i<DBUS_REGISTER_LENGTH;i++)
-//        {
-//            Dbus_Register[i]=rand();
-//        }
-//        Write_Multiple_Registers(0,0,128,Dbus_Register);
+        for(i=0;i<128;i++)
+        {
+           Dbus.Register[i]=rand();
+        }
+//        Write_Multiple_Registers(0,0,128,Register);
 //        rm = Read_Multiple_Registers(0,0,128);
 		delay_ms(1000);
 	}
@@ -394,10 +394,7 @@ void task4_task(void *p_arg)
     
 		 delay_ms(10);
         //收到结束符触发解包函 
-        if (DBUS_RECIVE_BUF[DBUS_RECIVE_LEN - 1] == DBUS_END)
-        {
-            OpenBox();
-        }
+        Dbus.OpenBox();
 	}
 }
 

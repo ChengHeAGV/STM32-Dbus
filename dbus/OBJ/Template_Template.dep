@@ -72,7 +72,13 @@ I (..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_can.h)(0x5A94BB6D)
 I (..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_dac.h)(0x5A94BB6D)
 I (..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_dcmi.h)(0x5A94BB6D)
 I (..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_fsmc.h)(0x5A94BB6D)
-F (.\main.c)(0x5A952BA7)(-c --cpu Cortex-M4.fp -g -O0 --apcs=interwork -I..\CORE -I..\SYSTEM\delay -I..\SYSTEM\sys -I..\SYSTEM\usart -I..\FWLIB\STM32F4xx_StdPeriph_Driver\inc -I..\USER -I..\HARDWARE\IO -I..\HARDWARE\LED -I..\UCOSIII\uC-CPU -I..\UCOSIII\uC-LIB -I..\UCOSIII\uCOS-III -I..\UCOSIII\UCOS_BSP -I..\UCOSIII\uCOS_CONFIG -I..\UCOSIII\uCOS-III\Source -I..\UCOSIII\uC-CPU\ARM-Cortex-M4\RealView -I..\UCOSIII\uC-LIB\Ports\ARM-Cortex-M4\RealView -I..\UCOSIII\uCOS-III\Ports\ARM-Cortex-M4\Generic\RealView -I..\HARDWARE\BEEP -I..\HARDWARE\TIMER7 -I..\HARDWARE\USART3 -I..\USER -I..\HARDWARE\USART2 -I..\HARDWARE\MODBUS -I..\HARDWARE\USART6 -I..\HARDWARE\ADC -I..\HARDWARE\W25QXX -I..\HARDWARE\SPI -I..\USER-I D:\github\stm32\dbus\dbus\USER\RTE-I C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.7.0-I C:\Keil_v5\ARM\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.7.0\Device\Include-D__UVISION_VERSION="514" -DSTM32F407xx -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER -D__FPU_USED="1"-o ..\obj\main.o --omf_browse ..\obj\main.crf --depend ..\obj\main.d)
+F (.\dbus.c)(0x5A9633EF)(-c --cpu Cortex-M4.fp -g -O0 --apcs=interwork -I..\CORE -I..\SYSTEM\delay -I..\SYSTEM\sys -I..\SYSTEM\usart -I..\FWLIB\STM32F4xx_StdPeriph_Driver\inc -I..\USER -I..\HARDWARE\IO -I..\HARDWARE\LED -I..\UCOSIII\uC-CPU -I..\UCOSIII\uC-LIB -I..\UCOSIII\uCOS-III -I..\UCOSIII\UCOS_BSP -I..\UCOSIII\uCOS_CONFIG -I..\UCOSIII\uCOS-III\Source -I..\UCOSIII\uC-CPU\ARM-Cortex-M4\RealView -I..\UCOSIII\uC-LIB\Ports\ARM-Cortex-M4\RealView -I..\UCOSIII\uCOS-III\Ports\ARM-Cortex-M4\Generic\RealView -I..\HARDWARE\BEEP -I..\HARDWARE\TIMER7 -I..\HARDWARE\USART3 -I..\USER -I..\HARDWARE\USART2 -I..\HARDWARE\MODBUS -I..\HARDWARE\USART6 -I..\HARDWARE\ADC -I..\HARDWARE\W25QXX -I..\HARDWARE\SPI -I..\USER-I D:\github\stm32\dbus\dbus\USER\RTE-I C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.7.0-I C:\Keil_v5\ARM\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.7.0\Device\Include-D__UVISION_VERSION="514" -DSTM32F407xx -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER -D__FPU_USED="1"-o ..\obj\dbus.o --omf_browse ..\obj\dbus.crf --depend ..\obj\dbus.d)
+I (dbus.h)(0x5A9632BA)
+I (C:\Keil_v5\ARM\ARMCC\include\string.h)(0x5475F300)
+I (C:\Keil_v5\ARM\ARMCC\include\stdarg.h)(0x5475F2FA)
+I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x5475F300)
+I (C:\Keil_v5\ARM\ARMCC\include\stdlib.h)(0x5475F300)
+F (.\main.c)(0x5A962D2F)(-c --cpu Cortex-M4.fp -g -O0 --apcs=interwork -I..\CORE -I..\SYSTEM\delay -I..\SYSTEM\sys -I..\SYSTEM\usart -I..\FWLIB\STM32F4xx_StdPeriph_Driver\inc -I..\USER -I..\HARDWARE\IO -I..\HARDWARE\LED -I..\UCOSIII\uC-CPU -I..\UCOSIII\uC-LIB -I..\UCOSIII\uCOS-III -I..\UCOSIII\UCOS_BSP -I..\UCOSIII\uCOS_CONFIG -I..\UCOSIII\uCOS-III\Source -I..\UCOSIII\uC-CPU\ARM-Cortex-M4\RealView -I..\UCOSIII\uC-LIB\Ports\ARM-Cortex-M4\RealView -I..\UCOSIII\uCOS-III\Ports\ARM-Cortex-M4\Generic\RealView -I..\HARDWARE\BEEP -I..\HARDWARE\TIMER7 -I..\HARDWARE\USART3 -I..\USER -I..\HARDWARE\USART2 -I..\HARDWARE\MODBUS -I..\HARDWARE\USART6 -I..\HARDWARE\ADC -I..\HARDWARE\W25QXX -I..\HARDWARE\SPI -I..\USER-I D:\github\stm32\dbus\dbus\USER\RTE-I C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.7.0-I C:\Keil_v5\ARM\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.7.0\Device\Include-D__UVISION_VERSION="514" -DSTM32F407xx -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER -D__FPU_USED="1"-o ..\obj\main.o --omf_browse ..\obj\main.crf --depend ..\obj\main.d)
 I (..\SYSTEM\sys\sys.h)(0x5A94BB6E)
 I (..\USER\stm32f4xx.h)(0x5A94BB6E)
 I (..\CORE\core_cm4.h)(0x5A94BB6D)
@@ -140,11 +146,10 @@ I (..\UCOSIII\uCOS-III\Ports\ARM-Cortex-M4\Generic\RealView\os_cpu.h)(0x5A94BB6E
 I (..\UCOSIII\uC-LIB\lib_math.h)(0x5A94BB6E)
 I (..\UCOSIII\uCOS_CONFIG\app_cfg.h)(0x5A94BB6E)
 I (..\UCOSIII\UCOS_BSP\bsp.h)(0x5A94BB6E)
-I (..\HARDWARE\ADC\adc.h)(0x5A94BB6E)
+I (..\HARDWARE\ADC\adc.h)(0x5A961C19)
 I (..\HARDWARE\W25QXX\w25qxx.h)(0x5A94BB6E)
-I (dbus.h)(0x5A94BB6E)
+I (dbus.h)(0x5A9632BA)
 F (.\readme.txt)(0x5A94BB6E)()
-F (.\dbus.lib)(0x5A9529F4)()
 F (..\HARDWARE\IO\io.c)(0x5A94BB6E)(-c --cpu Cortex-M4.fp -g -O0 --apcs=interwork -I..\CORE -I..\SYSTEM\delay -I..\SYSTEM\sys -I..\SYSTEM\usart -I..\FWLIB\STM32F4xx_StdPeriph_Driver\inc -I..\USER -I..\HARDWARE\IO -I..\HARDWARE\LED -I..\UCOSIII\uC-CPU -I..\UCOSIII\uC-LIB -I..\UCOSIII\uCOS-III -I..\UCOSIII\UCOS_BSP -I..\UCOSIII\uCOS_CONFIG -I..\UCOSIII\uCOS-III\Source -I..\UCOSIII\uC-CPU\ARM-Cortex-M4\RealView -I..\UCOSIII\uC-LIB\Ports\ARM-Cortex-M4\RealView -I..\UCOSIII\uCOS-III\Ports\ARM-Cortex-M4\Generic\RealView -I..\HARDWARE\BEEP -I..\HARDWARE\TIMER7 -I..\HARDWARE\USART3 -I..\USER -I..\HARDWARE\USART2 -I..\HARDWARE\MODBUS -I..\HARDWARE\USART6 -I..\HARDWARE\ADC -I..\HARDWARE\W25QXX -I..\HARDWARE\SPI -I..\USER-I D:\github\stm32\dbus\dbus\USER\RTE-I C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.7.0-I C:\Keil_v5\ARM\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.7.0\Device\Include-D__UVISION_VERSION="514" -DSTM32F407xx -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER -D__FPU_USED="1"-o ..\obj\io.o --omf_browse ..\obj\io.crf --depend ..\obj\io.d)
 I (..\HARDWARE\IO\io.h)(0x5A94BB6E)
 I (..\SYSTEM\sys\sys.h)(0x5A94BB6E)
@@ -419,7 +424,7 @@ I (..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_dac.h)(0x5A94BB6D)
 I (..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_dcmi.h)(0x5A94BB6D)
 I (..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_fsmc.h)(0x5A94BB6D)
 I (..\HARDWARE\USART2\USART2.h)(0x5A94BB6E)
-F (..\HARDWARE\USART6\usart6.c)(0x5A94BB6E)(-c --cpu Cortex-M4.fp -g -O0 --apcs=interwork -I..\CORE -I..\SYSTEM\delay -I..\SYSTEM\sys -I..\SYSTEM\usart -I..\FWLIB\STM32F4xx_StdPeriph_Driver\inc -I..\USER -I..\HARDWARE\IO -I..\HARDWARE\LED -I..\UCOSIII\uC-CPU -I..\UCOSIII\uC-LIB -I..\UCOSIII\uCOS-III -I..\UCOSIII\UCOS_BSP -I..\UCOSIII\uCOS_CONFIG -I..\UCOSIII\uCOS-III\Source -I..\UCOSIII\uC-CPU\ARM-Cortex-M4\RealView -I..\UCOSIII\uC-LIB\Ports\ARM-Cortex-M4\RealView -I..\UCOSIII\uCOS-III\Ports\ARM-Cortex-M4\Generic\RealView -I..\HARDWARE\BEEP -I..\HARDWARE\TIMER7 -I..\HARDWARE\USART3 -I..\USER -I..\HARDWARE\USART2 -I..\HARDWARE\MODBUS -I..\HARDWARE\USART6 -I..\HARDWARE\ADC -I..\HARDWARE\W25QXX -I..\HARDWARE\SPI -I..\USER-I D:\github\stm32\dbus\dbus\USER\RTE-I C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.7.0-I C:\Keil_v5\ARM\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.7.0\Device\Include-D__UVISION_VERSION="514" -DSTM32F407xx -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER -D__FPU_USED="1"-o ..\obj\usart6.o --omf_browse ..\obj\usart6.crf --depend ..\obj\usart6.d)
+F (..\HARDWARE\USART6\usart6.c)(0x5A9619FC)(-c --cpu Cortex-M4.fp -g -O0 --apcs=interwork -I..\CORE -I..\SYSTEM\delay -I..\SYSTEM\sys -I..\SYSTEM\usart -I..\FWLIB\STM32F4xx_StdPeriph_Driver\inc -I..\USER -I..\HARDWARE\IO -I..\HARDWARE\LED -I..\UCOSIII\uC-CPU -I..\UCOSIII\uC-LIB -I..\UCOSIII\uCOS-III -I..\UCOSIII\UCOS_BSP -I..\UCOSIII\uCOS_CONFIG -I..\UCOSIII\uCOS-III\Source -I..\UCOSIII\uC-CPU\ARM-Cortex-M4\RealView -I..\UCOSIII\uC-LIB\Ports\ARM-Cortex-M4\RealView -I..\UCOSIII\uCOS-III\Ports\ARM-Cortex-M4\Generic\RealView -I..\HARDWARE\BEEP -I..\HARDWARE\TIMER7 -I..\HARDWARE\USART3 -I..\USER -I..\HARDWARE\USART2 -I..\HARDWARE\MODBUS -I..\HARDWARE\USART6 -I..\HARDWARE\ADC -I..\HARDWARE\W25QXX -I..\HARDWARE\SPI -I..\USER-I D:\github\stm32\dbus\dbus\USER\RTE-I C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.7.0-I C:\Keil_v5\ARM\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.7.0\Device\Include-D__UVISION_VERSION="514" -DSTM32F407xx -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER -D__FPU_USED="1"-o ..\obj\usart6.o --omf_browse ..\obj\usart6.crf --depend ..\obj\usart6.d)
 I (..\SYSTEM\delay\delay.h)(0x5A94BB6E)
 I (..\SYSTEM\sys\sys.h)(0x5A94BB6E)
 I (..\USER\stm32f4xx.h)(0x5A94BB6E)
@@ -460,9 +465,9 @@ I (..\HARDWARE\USART6\usart6.h)(0x5A94BB6E)
 I (C:\Keil_v5\ARM\ARMCC\include\stdarg.h)(0x5475F2FA)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x5475F300)
 I (C:\Keil_v5\ARM\ARMCC\include\string.h)(0x5475F300)
-I (..\USER\dbus.h)(0x5A94BB6E)
+I (..\USER\dbus.h)(0x5A9632BA)
 F (..\HARDWARE\ADC\adc.c)(0x5A94BB6E)(-c --cpu Cortex-M4.fp -g -O0 --apcs=interwork -I..\CORE -I..\SYSTEM\delay -I..\SYSTEM\sys -I..\SYSTEM\usart -I..\FWLIB\STM32F4xx_StdPeriph_Driver\inc -I..\USER -I..\HARDWARE\IO -I..\HARDWARE\LED -I..\UCOSIII\uC-CPU -I..\UCOSIII\uC-LIB -I..\UCOSIII\uCOS-III -I..\UCOSIII\UCOS_BSP -I..\UCOSIII\uCOS_CONFIG -I..\UCOSIII\uCOS-III\Source -I..\UCOSIII\uC-CPU\ARM-Cortex-M4\RealView -I..\UCOSIII\uC-LIB\Ports\ARM-Cortex-M4\RealView -I..\UCOSIII\uCOS-III\Ports\ARM-Cortex-M4\Generic\RealView -I..\HARDWARE\BEEP -I..\HARDWARE\TIMER7 -I..\HARDWARE\USART3 -I..\USER -I..\HARDWARE\USART2 -I..\HARDWARE\MODBUS -I..\HARDWARE\USART6 -I..\HARDWARE\ADC -I..\HARDWARE\W25QXX -I..\HARDWARE\SPI -I..\USER-I D:\github\stm32\dbus\dbus\USER\RTE-I C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.7.0-I C:\Keil_v5\ARM\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.7.0\Device\Include-D__UVISION_VERSION="514" -DSTM32F407xx -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER -D__FPU_USED="1"-o ..\obj\adc.o --omf_browse ..\obj\adc.crf --depend ..\obj\adc.d)
-I (..\HARDWARE\ADC\adc.h)(0x5A94BB6E)
+I (..\HARDWARE\ADC\adc.h)(0x5A961C19)
 I (..\SYSTEM\sys\sys.h)(0x5A94BB6E)
 I (..\USER\stm32f4xx.h)(0x5A94BB6E)
 I (..\CORE\core_cm4.h)(0x5A94BB6D)

@@ -26,7 +26,7 @@ void USART6_IRQHandler(void)
   if(USART_GetITStatus(USART6, USART_IT_RXNE) != RESET)                   //这段是为了避免STM32 USART 第一个字节发不出去的BUG 
   {  
     char c=USART_ReceiveData(USART6);
-    InPut(c);	
+    Dbus.InPut(c);
     USART_ClearFlag(USART6, USART_IT_RXNE);
   }	
 }  
