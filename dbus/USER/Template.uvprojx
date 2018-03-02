@@ -419,11 +419,6 @@
               <FilePath>.\system_stm32f4xx.c</FilePath>
             </File>
             <File>
-              <FileName>dbus.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\dbus.c</FilePath>
-            </File>
-            <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\main.c</FilePath>
@@ -432,6 +427,11 @@
               <FileName>readme.txt</FileName>
               <FileType>5</FileType>
               <FilePath>.\readme.txt</FilePath>
+            </File>
+            <File>
+              <FileName>dbus.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>.\dbus.lib</FilePath>
             </File>
           </Files>
         </Group>

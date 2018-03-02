@@ -124,7 +124,7 @@ int main(void)
 	Adc_Init();         //初始化ADC
 	W25QXX_Init();//FLASH初始化 
     
-  //初始化DBUS
+    //初始化DBUS
     Dbus.Init(5);
 	Dbus.OutPut_interrupt(WIFI_Send);	
 	Dbus.Delay_interrupt(delay);
@@ -303,7 +303,7 @@ int check(char* dst,u16 timeout,char* src,...)
 
 char* AP="geekiot";
 char* PASSWORD="8008208820";
-char* HOST_IP="192.168.191.3";
+char* HOST_IP="192.168.191.4";
 char* HOST_PORT="18666";
 //task1任务函数
 void task1_task(void *p_arg)

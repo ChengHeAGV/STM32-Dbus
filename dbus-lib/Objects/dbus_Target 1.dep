@@ -1,6 +1,6 @@
 Dependencies for Project 'dbus', Target 'Target 1': (DO NOT MODIFY !)
-F (.\dbus\dbus.c)(0x5A9529C9)(-c --cpu Cortex-M4.fp -g -O0 --apcs=interwork --split_sections-I D:\github\stm32\dbus\dbus-lib\RTE-I C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.7.0-I C:\Keil_v5\ARM\CMSIS\Include-D__UVISION_VERSION="514" -DSTM32F407xx-o .\objects\dbus.o --omf_browse .\objects\dbus.crf --depend .\objects\dbus.d)
-I (dbus\dbus.h)(0x5A94BB6E)
+F (.\dbus\dbus.c)(0x5A98F281)(-c --cpu Cortex-M4.fp -g -O0 --apcs=interwork --split_sections-I D:\github\stm32\dbus\dbus-lib\RTE-I C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.7.0-I C:\Keil_v5\ARM\CMSIS\Include-D__UVISION_VERSION="514" -DSTM32F407xx-o .\objects\dbus.o --omf_browse .\objects\dbus.crf --depend .\objects\dbus.d)
+I (dbus\dbus.h)(0x5A98F27F)
 I (C:\Keil_v5\ARM\ARMCC\include\string.h)(0x5475F300)
 I (C:\Keil_v5\ARM\ARMCC\include\stdarg.h)(0x5475F2FA)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x5475F300)

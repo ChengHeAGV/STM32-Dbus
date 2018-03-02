@@ -96,16 +96,15 @@ void u2_printf(char* fmt,...)
 	  while(USART_GetFlagStatus(USART2,USART_FLAG_TC)==RESET);  //等待上次传输完成 
 		USART_SendData(USART2,(uint8_t)USART2_TX_BUF[j]); 	 //发送数据到串口2 
 	}
-	
 }
 
 void USART_OUT(USART_TypeDef* USARTx, char *Data,u16 len)
 { 
 	while(len--)
-		{				                          //判断是否到达字符串结束符
-			USART_SendData(USARTx, *Data++);
-		  while(USART_GetFlagStatus(USARTx, USART_FLAG_TC)==RESET);
-	  }
+	{				                          //判断是否到达字符串结束符
+		USART_SendData(USARTx, *Data++);
+		while(USART_GetFlagStatus(USARTx, USART_FLAG_TC)==RESET);
+	 }
 }
 
 
