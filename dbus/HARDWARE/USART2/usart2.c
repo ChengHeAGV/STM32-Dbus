@@ -5,6 +5,8 @@
 #include "string.h"	  
 #include "timer.h"
 #include "modbus.h"
+#include "dbus.h"
+
 
 //串口发送缓存区 	
 __align(8) u8 USART2_TX_BUF[USART2_MAX_SEND_LEN]; 	//发送缓冲,最大USART2_MAX_SEND_LEN字节
@@ -23,14 +25,20 @@ u8 RxCounter2=0;
 u16 USART2_RX_STA=0;   	 
 void USART2_IRQHandler(void)
 {
-	comm_END=2;                  //9600的波特率下，等待3.5个字节需要约4ms的时间
-	Reciver_bit=1;              //产生一次中断置一次位
-	USART2_RX_BUF[RxCounter2++]= USART_ReceiveData(USART2);   //将读寄存器的数据缓存到接收缓冲区里
-  	
-  if(USART_GetITStatus(USART2, USART_IT_TXE) != RESET)                   //这段是为了避免STM32 USART 第一个字节发不出去的BUG 
-  { 
-     USART_ITConfig(USART2, USART_IT_TXE, DISABLE);					     //禁止发缓冲器空中断， 
-	}										 
+//  if(USART_GetITStatus(USART2, USART_IT_RXNE) != RESET)                   //这段是为了避免STM32 USART 第一个字节发不出去的BUG 
+//  {  
+//    char c=USART_ReceiveData(USART2);
+//    Dbus.InPut(c);
+//    USART_ClearFlag(USART2, USART_IT_RXNE);
+//  }	
+//	comm_END=2;                  //9600的波特率下，等待3.5个字节需要约4ms的时间
+//	Reciver_bit=1;              //产生一次中断置一次位
+//	USART2_RX_BUF[RxCounter2++]= USART_ReceiveData(USART2);   //将读寄存器的数据缓存到接收缓冲区里
+//  	
+//  if(USART_GetITStatus(USART2, USART_IT_TXE) != RESET)                   //这段是为了避免STM32 USART 第一个字节发不出去的BUG 
+//  { 
+//     USART_ITConfig(USART2, USART_IT_TXE, DISABLE);					     //禁止发缓冲器空中断， 
+//	}										 
 }  
 #endif	
 //初始化IO 串口2
@@ -42,20 +50,20 @@ void usart2_init(u32 bound)
 	USART_InitTypeDef USART_InitStructure;
 	NVIC_InitTypeDef NVIC_InitStructure;
 	
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA,ENABLE); //使能GPIOA时钟
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD,ENABLE); //使能GPIOA时钟
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2,ENABLE);//使能USART1时钟
  
 	//串口1对应引脚复用映射
-	GPIO_PinAFConfig(GPIOA,GPIO_PinSource2,GPIO_AF_USART2); //GPIOA9复用为USART1
-	GPIO_PinAFConfig(GPIOA,GPIO_PinSource3,GPIO_AF_USART2); //GPIOA10复用为USART1
+	GPIO_PinAFConfig(GPIOD,GPIO_PinSource5,GPIO_AF_USART2); //GPIOA9复用为USART1
+	GPIO_PinAFConfig(GPIOD,GPIO_PinSource6,GPIO_AF_USART2); //GPIOA10复用为USART1
 	
 	//USART1端口配置
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2 | GPIO_Pin_3; //GPIOA9与GPIOA10
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5 | GPIO_Pin_6; //GPIOA9与GPIOA10
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;//复用功能
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;	//速度50MHz
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP; //推挽复用输出
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP; //上拉
-	GPIO_Init(GPIOA,&GPIO_InitStructure); //初始化PA9，PA10
+	GPIO_Init(GPIOD,&GPIO_InitStructure); //初始化PA9，PA10
 
   //USART1 初始化设置
 	USART_InitStructure.USART_BaudRate = bound;//波特率设置
@@ -75,8 +83,8 @@ void usart2_init(u32 bound)
 
 	//Usart1 NVIC 配置
 	NVIC_InitStructure.NVIC_IRQChannel = USART2_IRQn;//串口1中断通道
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=3;//抢占优先级3
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority =3;		//子优先级3
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=0;//抢占优先级3
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority =0;		//子优先级3
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;			//IRQ通道使能
 	NVIC_Init(&NVIC_InitStructure);	//根据指定的参数初始化VIC寄存器、
 }

@@ -42,3 +42,4 @@
 ..\obj\usart2.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 ..\obj\usart2.o: ..\HARDWARE\TIMER7\timer.h
 ..\obj\usart2.o: ..\HARDWARE\MODBUS\modbus.h
+..\obj\usart2.o: ..\USER\dbus.h

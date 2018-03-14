@@ -41,3 +41,4 @@
 ..\obj\usart3.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 ..\obj\usart3.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 ..\obj\usart3.o: ..\HARDWARE\TIMER7\timer.h
+..\obj\usart3.o: ..\USER\dbus.h

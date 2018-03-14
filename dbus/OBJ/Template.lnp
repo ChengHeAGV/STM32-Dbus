@@ -1,8 +1,8 @@
---cpu Cortex-M4.fp
+--cpu=Cortex-M4.fp
 "..\obj\stm32f4xx_it.o"
 "..\obj\system_stm32f4xx.o"
 "..\obj\main.o"
-".\dbus.lib"
+"..\obj\dbus.o"
 "..\obj\io.o"
 "..\obj\led.o"
 "..\obj\beep.o"

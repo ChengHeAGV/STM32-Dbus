@@ -4,7 +4,7 @@
 #include "stdio.h"	 	 
 #include "string.h"	  
 #include "timer.h"
-
+#include "dbus.h"
 u8 TxCounter3=0;
 u8 RxCounter3=0;
 
@@ -16,12 +16,18 @@ u8 USART3_RX_BUF[USART3_MAX_RECV_LEN]; 				//½ÓÊÕ»º³å,×î´óUSART3_MAX_RECV_LEN¸ö×
 u16 USART3_RX_STA=0;   	 
 void USART3_IRQHandler(void)
 {
-	USART3_RX_BUF[RxCounter3++]= USART_ReceiveData(USART3);   //½«¶Á¼Ä´æÆ÷µÄÊý¾Ý»º´æµ½½ÓÊÕ»º³åÇøÀï
-  	
-  if(USART_GetITStatus(USART3, USART_IT_TXE) != RESET)                   //Õâ¶ÎÊÇÎªÁË±ÜÃâSTM32 USART µÚÒ»¸ö×Ö½Ú·¢²»³öÈ¥µÄBUG 
-  { 
-     USART_ITConfig(USART3, USART_IT_TXE, DISABLE);					     //½ûÖ¹·¢»º³åÆ÷¿ÕÖÐ¶Ï£¬ 
-	}	
+	  if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET)                   //Õâ¶ÎÊÇÎªÁË±ÜÃâSTM32 USART µÚÒ»¸ö×Ö½Ú·¢²»³öÈ¥µÄBUG 
+  {  
+    char c=USART_ReceiveData(USART3);
+    Dbus.InPut(c);
+    USART_ClearFlag(USART3, USART_IT_RXNE);
+  }
+//	USART3_RX_BUF[RxCounter3++]= USART_ReceiveData(USART3);   //½«¶Á¼Ä´æÆ÷µÄÊý¾Ý»º´æµ½½ÓÊÕ»º³åÇøÀï
+//  	
+//  if(USART_GetITStatus(USART3, USART_IT_TXE) != RESET)                   //Õâ¶ÎÊÇÎªÁË±ÜÃâSTM32 USART µÚÒ»¸ö×Ö½Ú·¢²»³öÈ¥µÄBUG 
+//  { 
+//     USART_ITConfig(USART3, USART_IT_TXE, DISABLE);					     //½ûÖ¹·¢»º³åÆ÷¿ÕÖÐ¶Ï£¬ 
+//	}	
 }  
 #endif	
 //³õÊ¼»¯IO ´®¿Ú3

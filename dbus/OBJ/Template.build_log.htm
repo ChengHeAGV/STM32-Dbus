@@ -3,85 +3,45 @@
 <pre>
 <h1>µVision Build Log</h1>
 <h2>Tool Versions:</h2>
-IDE-Version: ¦ÌVision V5.14.0.0
-Copyright (C) 2015 ARM Ltd and ARM Germany GmbH. All rights reserved.
+IDE-Version: ¦ÌVision V5.23.0.0
+Copyright (C) 2017 ARM Ltd and ARM Germany GmbH. All rights reserved.
 License Information: asd AutoBVT, Microsoft, LIC=Z3C63-AYI5J-LVU1I-T3MDI-PD1A6-PPKQ1
  
 Tool Versions:
-Toolchain:       MDK-ARM Professional  Version: 5.14.0.0
+Toolchain:       MDK-ARM Professional  Version: 5.23
 Toolchain Path:  C:\Keil_v5\ARM\ARMCC\Bin
-C Compiler:      Armcc.exe V5.05 update 1 (build 106)
-Assembler:       Armasm.exe V5.05 update 1 (build 106)
-Linker/Locator:  ArmLink.exe V5.05 update 1 (build 106)
-Library Manager: ArmAr.exe V5.05 update 1 (build 106)
-Hex Converter:   FromElf.exe V5.05 update 1 (build 106)
-CPU DLL:         SARMCM3.DLL V5.14.0.0
-Dialog DLL:      DCM.DLL V1.13.1.0
-Target DLL:      Segger\JL2CM3.dll V2.99.13.0
-Dialog DLL:      TCM.DLL V1.14.4.0
+C Compiler:      Armcc.exe V5.06 update 4 (build 422)
+Assembler:       Armasm.exe V5.06 update 4 (build 422)
+Linker/Locator:  ArmLink.exe V5.06 update 4 (build 422)
+Library Manager: ArmAr.exe V5.06 update 4 (build 422)
+Hex Converter:   FromElf.exe V5.06 update 4 (build 422)
+CPU DLL:         SARMCM3.DLL V5.23
+Dialog DLL:      DCM.DLL V1.15.0.0
+Target DLL:      Segger\JL2CM3.dll V2.99.23.0
+Dialog DLL:      TCM.DLL V1.27.0.0
  
 <h2>Project:</h2>
 D:\github\stm32\dbus\dbus\USER\Template.uvprojx
-Project File Date:  02/28/2018
+Project File Date:  03/13/2018
 
 <h2>Output:</h2>
+*** Using Compiler 'V5.06 update 4 (build 422)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'Template'
 compiling main.c...
-dbus.h(47): warning:  #815-D: type qualifier on return type is meaningless
-        const void Init(u16 Address);
-dbus.h(48): warning:  #815-D: type qualifier on return type is meaningless
-        const void Heart(u16 TargetAddress);
-dbus.h(50): warning:  #815-D: type qualifier on return type is meaningless
-        const void InPut(char c);
-dbus.h(52): warning:  #815-D: type qualifier on return type is meaningless
-        const void OpenBox(void);
-dbus.h(54): warning:  #815-D: type qualifier on return type is meaningless
-        const void Analyze(char *buf ,u16 len);
-dbus.h(56): warning:  #815-D: type qualifier on return type is meaningless
-      const void OutPut_interrupt(void (*callback_fun)(char*,u16));
-dbus.h(58): warning:  #815-D: type qualifier on return type is meaningless
-        const void Delay_interrupt(void (*callback_delay)(void));
-dbus.h(60): warning:  #815-D: type qualifier on return type is meaningless
-        const void Heart(u16 TargetAddress);
-dbus.h(62): warning:  #815-D: type qualifier on return type is meaningless
-        const u8 Write_Register(u16 TargetAddress,u16 RegisterAddress,u16 Data);
-dbus.h(64): warning:  #815-D: type qualifier on return type is meaningless
-        const u8 Write_Multiple_Registers(u16 TargetAddress,u16 RegisterAddress,u16 Num,u16* Data);     
-dbus.h(66): warning:  #815-D: type qualifier on return type is meaningless
-        const struct _ReturnMsg Read_Register(u16 TargetAddress,u16 RegisterAddress);
-dbus.h(68): warning:  #815-D: type qualifier on return type is meaningless
-        const struct _ReturnMsg Read_Multiple_Registers(u16 TargetAddress,u16 RegisterAddress,u16 Num); 
-dbus.h(71): warning:  #815-D: type qualifier on return type is meaningless
-        const void Post_Register(u16 TargetAddress,u16 RegisterAddress,u16 Data);
-dbus.h(73): warning:  #815-D: type qualifier on return type is meaningless
-        const void Post_Multiple_Registers(u16 TargetAddress,u16 RegisterAddress,u16 Num,u16* Data);    
-dbus.h(77): warning:  #815-D: type qualifier on return type is meaningless
-        const void Response_Read_Register(char *buf);
-dbus.h(79): warning:  #815-D: type qualifier on return type is meaningless
-        const void Response_Write_Register(char *buf);
-dbus.h(81): warning:  #815-D: type qualifier on return type is meaningless
-        const void Response_Read_Multiple_Registers(char *buf);
-dbus.h(83): warning:  #815-D: type qualifier on return type is meaningless
-        const void Response_Write_Multiple_Registers(char *buf);
-dbus.h(87): warning:  #815-D: type qualifier on return type is meaningless
-        const void Response_Post_Register(char *buf);
-dbus.h(89): warning:  #815-D: type qualifier on return type is meaningless
-        const void Response_Post_Multiple_Registers(char *buf);
-dbus.h(92): warning:  #21-D: type qualifiers are meaningless in this declaration
-      const struct _ReturnMsg
-dbus.h(99): warning:  #21-D: type qualifiers are meaningless in this declaration
-      const struct _Dbus
-main.c: 22 warnings, 0 errors
+main.c(367): warning:  #177-D: variable "i"  was declared but never referenced
+      int i=0;
+main.c: 1 warning, 0 errors
 linking...
-Program Size: Code=68404 RO-data=1928 RW-data=380 ZI-data=52476  
+Program Size: Code=62496 RO-data=1884 RW-data=360 ZI-data=48152  
 FromELF: creating hex file...
-"..\OBJ\Template.axf" - 0 Error(s), 22 Warning(s).
+"..\OBJ\Template.axf" - 0 Error(s), 1 Warning(s).
 
 <h2>Collection of Component include folders:</h2>
-  D:\github\stm32\dbus\dbus\USER\RTE
-  C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.7.0
+  .\RTE\_Template
+  C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include
 
 <h2>Collection of Component Files used:</h2>
+Build Time Elapsed:  00:00:03
 </pre>
 </body>
 </html>

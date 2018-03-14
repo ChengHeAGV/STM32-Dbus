@@ -93,7 +93,7 @@ void task6_task(void *p_arg);
 
 void WIFI_Send(char *str,u16 len)
 {
-	USART_OUT(USART6,str,len);
+	USART_OUT(USART3,str,len);
 }
 void delay()
 {
@@ -118,15 +118,15 @@ int main(void)
 	IO_Init(); //IO初始化		
 	LED_Init();//led初始化
 	BEEP_Init();//蜂鸣器初始化
-	usart2_init(9600);
+	usart2_init(115200);
 	usart3_init(9600);
 	usart6_init(115200);
-	TIM3_Int_Init(100-1,8400-1);	//10ms中断一次
-	Adc_Init();         //初始化ADC
-	W25QXX_Init();//FLASH初始化 
+	//TIM3_Int_Init(100-1,8400-1);	//10ms中断一次
+	//Adc_Init();         //初始化ADC
+	//W25QXX_Init();//FLASH初始化 
     
     //初始化DBUS
-    Dbus.Init(5);
+    Dbus.Init(1);
 	Dbus.OutPut_interrupt(WIFI_Send);	
 	Dbus.Delay_interrupt(delay);
 
@@ -302,9 +302,9 @@ int check(char* dst,u16 timeout,char* src,...)
 }
 
 
-char* AP="geekiot";
-char* PASSWORD="8008208820";
-char* HOST_IP="192.168.191.4";
+char* AP="AGV_WIFI";
+char* PASSWORD="88341320";
+char* HOST_IP="192.168.127.226";
 char* HOST_PORT="18666";
 //task1任务函数
 void task1_task(void *p_arg)
@@ -321,49 +321,43 @@ void task1_task(void *p_arg)
 //task2任务函数
 void task2_task(void *p_arg)
 {
-    u16 num=0;
 	/////////////配置wifi//////////////////
 	//等待8266复位
-	delay_ms(1000);//ms<1840
-	delay_ms(1000);//ms<1840
-	u6_printf(" ");
+	//delay_ms(1000);//ms<1840
+	//delay_ms(1000);//ms<1840
 	//AT模式
 	//if(check("OK",500,"AT\r\n"))
 	//{
 		//check("OK",1000,"AT+CWMODE=1\r\n");//配置为STATION模式 no change
-		
+	
 		//check("OK",15000,"AT+CWJAP=\"%s\",\"%s\"\r\n",AP,PASSWORD);//加入AP
 		
-		check("OK",1000,"AT+CIPSTART=\"UDP\",\"%s\",%s\r\n",HOST_IP,HOST_PORT);//配置UDP ALREAY CONNECT
+		//check("OK",1000,"AT+CIPSTART=\"UDP\",\"%s\",%s\r\n",HOST_IP,HOST_PORT);//配置UDP ALREAY CONNECT
 		
-		check("OK",1000,"AT+CIPMODE=1\r\n");//
+		//check("OK",1000,"AT+CIPMODE=1\r\n");//
 		
-		check(">",1000,"AT+CIPSEND\r\n");//		
+		//check(">",1000,"AT+CIPSEND\r\n");//		
 	//}
 	////////////////////////////////////////
 
-    Dbus.Register[0]=0x1122;
-    Dbus.Register[1]=0x3366;
-    Dbus.Register[3]=0xaabb;
-	Heart(1);
+//    Dbus.Register[0]=0x1122;
+//    Dbus.Register[1]=0x3366;
+//    Dbus.Register[3]=0xaabb;
+	//Dbus.Heart(5);
 	while(1)
-	{
-       num++;
-		if(num==5)
-		{
-			num=0;
-           // Heart(0);
-            Dbus.Heart(0);
-		}
-		delay_ms(1000);
+	{	
+//		u2_printf("213");
+//       u3_printf("213");
+//      
+		delay_ms(3000);
        
   
 //		OSTimeDlyHMSM(0,0,1,0,OS_OPT_TIME_HMSM_STRICT,err);
 //        delay_ms(1000);
 //        delay_ms(1000);
 //        delay_ms(1000);
-//				Write_Register(0,1,num);
-				Dbus.ReturnMsg = Read_Register(0,1);
+				//Dbus.Write_Register(1,1,2);
+				//Dbus.ReturnMsg = Read_Register(0,1);
 	}
 }
 
@@ -371,16 +365,16 @@ void task2_task(void *p_arg)
 void task3_task(void *p_arg)
 {
     int i=0;
-    delay_ms(1000);
-    delay_ms(1000);
-    delay_ms(1000);
-    delay_ms(1000);
+    //delay_ms(1000);
+    //delay_ms(1000);
+    //delay_ms(1000);
+    //delay_ms(1000);
 	while(1)
 	{
-        for(i=0;i<128;i++)
-        {
-           Dbus.Register[i]=rand();
-        }
+//        for(i=0;i<128;i++)
+//        {
+//           Dbus.Register[i]=rand();
+//        }
 //        Write_Multiple_Registers(0,0,128,Register);
 //        rm = Read_Multiple_Registers(0,0,128);
 		delay_ms(1000);
@@ -390,12 +384,19 @@ void task3_task(void *p_arg)
 //task4任务函数
 void task4_task(void *p_arg)
 {
+    u16 num=0;
 	while(1)
 	{
     
-		 delay_ms(10);
-        //收到结束符触发解包函 
-        Dbus.OpenBox();
+		delay_ms(10);
+		//收到结束符触发解包函 
+		Dbus.OpenBox();
+		num++;
+		if(num==100)
+		{
+			num=0;
+      //Dbus.Heart(0);
+		}
 	}
 }
 
