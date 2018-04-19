@@ -44,7 +44,7 @@
     /*****************Public*****************/
     /*****************Private*****************/
 	//初始化
-    void Init(u16 Address);
+	void Init(u16 Address);
 	void Heart(u16 TargetAddress);
 	//输入数据
 	void InPut(char c);
@@ -99,7 +99,7 @@
     struct _Dbus
     {
         //变量
-        u16* Register;
+        u16 Register[DBUS_REGISTER_LENGTH];
         struct _ReturnMsg ReturnMsg;
         //函数
         void (*Init)(u16 Address);

@@ -99,7 +99,7 @@
     struct _Dbus
     {
         //±äÁ¿
-        u16* Register;
+        u16 Register[DBUS_REGISTER_LENGTH];
         struct _ReturnMsg ReturnMsg;
         //º¯Êý
         void (*Init)(u16 Address);

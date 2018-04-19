@@ -6,8 +6,6 @@
 
 //本机地址
 u16 LocalAddress;
-//寄存器
-u16 Register[DBUS_REGISTER_LENGTH];
 //数据接收缓冲池
 char DBUS_RECIVE_BUF[DBUS_MAX_RECIVE_BUF];
 //响应消息队列缓冲池长度
@@ -51,7 +49,7 @@ u16 dataBuf[DBUS_REGISTER_LENGTH];
 struct _Dbus Dbus = 
 {
     //变量
-    Register,   
+    {0},   
     0,
     0,
     dataBuf,
@@ -70,7 +68,6 @@ struct _Dbus Dbus =
     Post_Register,
     Post_Multiple_Registers
 };
-
 
 /**********函数结构体***********************************************/
 
@@ -773,8 +770,8 @@ void Response_Read_Register(char *buf)
 	}
 	else
 	{
-		TX_BUF[10] = Register[regAdd]>>8;//数据高
-		TX_BUF[11] = Register[regAdd];//数据低
+		TX_BUF[10] = Dbus.Register[regAdd]>>8;//数据高
+		TX_BUF[11] = Dbus.Register[regAdd];//数据低
 	}
 	CRC=CRC_CALC(TX_BUF,12);
 	TX_BUF[12] = CRC>>8;//CRC高
@@ -814,7 +811,7 @@ void Response_Write_Register(char *buf)
 	{
 		TX_BUF[8] = 1;//结果	
 		//更新数据
-		Register[regAdd] = data;
+		Dbus.Register[regAdd] = data;
 	}
 		
 	CRC=CRC_CALC(TX_BUF,9);
@@ -859,8 +856,8 @@ void Response_Read_Multiple_Registers(char *buf)
 		}
 		else
 		{
-			TX_BUF[11+i*2] = Register[regStartAdd+i]>>8;//数据高
-			TX_BUF[12+i*2] = Register[regStartAdd+i];//数据低
+			TX_BUF[11+i*2] = Dbus.Register[regStartAdd+i]>>8;//数据高
+			TX_BUF[12+i*2] = Dbus.Register[regStartAdd+i];//数据低
 		}
 	}
 
@@ -905,7 +902,7 @@ void Response_Write_Multiple_Registers(char *buf)
 		{
 			TX_BUF[8] = 1;//结果	
 			//更新数据
-			Register[regStartAdd+i] = buf[11+i*2]<<8|buf[12+i*2];
+			Dbus.Register[regStartAdd+i] = buf[11+i*2]<<8|buf[12+i*2];
 		}
 	}
 
@@ -933,7 +930,7 @@ void Response_Post_Register(char *buf)
 	if(regAdd<DBUS_REGISTER_LENGTH)
 	{
         //更新数据
-		Register[regAdd] = data;
+		Dbus.Register[regAdd] = data;
 	}
 } 
  
@@ -950,7 +947,7 @@ void Response_Post_Multiple_Registers(char *buf)
 		if((regStartAdd+i)<=DBUS_REGISTER_LENGTH)
 		{
 			//更新数据
-			Register[regStartAdd+i] = buf[11+i*2]<<8|buf[12+i*2];	
+			Dbus.Register[regStartAdd+i] = buf[11+i*2]<<8|buf[12+i*2];	
 		}
 	}		 
  } 
